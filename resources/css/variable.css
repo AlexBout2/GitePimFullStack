@@ -1,0 +1,12 @@
+:root {
+    --primary: rgb(9, 1, 43);
+    --primary-t: rgba(9, 1, 43, 0.5);
+    --secondary: rgb(96, 91, 241);
+    --secondary-t: rgba(96, 91, 241, 0.5);
+    --event: rgb(254, 138, 36);
+    --event-t: rgba(254, 138, 36, 0.5);
+    
+    --marge: 10px;
+    --hauteur-menu: 30px;
+    --hauteur-pied: 30px;
+}

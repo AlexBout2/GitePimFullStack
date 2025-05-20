@@ -1,0 +1,52 @@
+.footer {
+  background: linear-gradient(90deg, #09012b, #605bf1);
+  /* Dégradé */
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 1em;
+}
+
+.footer h6 {
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  color: white;
+}
+
+.footer p {
+  font-size: 0.9rem;
+  color: white;
+}
+
+.footer a {
+  color: white;
+  /* Couleur par défaut */
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.footer a:hover {
+  color: #ffc107;
+  /* Jaune au survol */
+  text-decoration: underline;
+}
+
+.footer p:hover {
+  color: #ffc107;
+  /* Le texte interactif devient jaune au survol */
+}
+
+.footer .list-unstyled {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.footer img {
+  transition: transform 0.3s ease-in-out;
+}
+
+.footer img:hover {
+  transform: scale(1.1);
+}

@@ -1,0 +1,282 @@
+/* Import : variables + responsive */
+@import "./variable.css";
+
+
+/* Général */
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1em;
+}
+
+h1,
+h2,
+h3,
+p {
+  color: var(--primary);
+}
+
+li,
+li a {
+  color: white;
+}
+
+button {
+  border: 1px solid var(--primary);
+  border-radius: 80px;
+  color: white;
+  background-color: var(--primary);
+}
+
+button:hover {
+  color: var(--primary);
+  background-color: var(--event);
+}
+
+.glass-effect {
+  background: rgba(75, 74, 74, 0.3);
+  backdrop-filter: blur(3px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+}
+
+/* Image de la page d'accueil */
+
+
+.img-accueil {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+/* Menu top */
+header {
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: var(--hauteur-menu);
+  background-color: var(--primary-t);
+}
+
+.hero {
+  min-height: 70vh;
+  margin: 0;
+  position: flex;
+}
+
+.hero-container {
+  padding: 3rem;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.hero .hero-container-bg {
+  padding: 3rem;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  background-image: url('../../public/media/hero-main.webp');
+  background-size: cover;
+  background-position: center;
+  height: 70vh;
+}
+
+
+
+/* Styles du texte hero */
+.hero-text-box {
+  padding: 0.5rem;
+  text-align: left;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+
+
+/* HERO ***/
+
+.text-shadow {
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
+  color: white;
+}
+
+
+.sep-main {
+  background-image: url('../../public/media/blue-kayak-sandy-sea-shore.webp');
+  background-size: cover;
+  background-position: 100% 50%;
+  height: 30vh;
+}
+
+
+/* button ****************/
+.btn-main {
+  display: inline-block;
+  background-color: #FE8A24;
+  border-radius: 5px;
+  padding: 15px 25px;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  transition: all 0.3s ease-in-out;
+  text-decoration: none;
+}
+
+.btn-main:hover {
+  background-color: #09012B;
+  transform: scale(1);
+  padding: 20px 30px;
+  color: white;
+}
+
+
+.btn-reservation {
+  display: inline-block;
+  background-color: #FE8A24;
+  border-radius: 5px;
+  padding: 15px 25px;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+  color: white;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.btn-reservation:hover {
+  background-color: #09012B;
+  transform: scale(1);
+  padding: 15px 20px;
+}
+
+.btn-text {
+  color: white;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.btn-reservation:hover .btn-text {
+  background-color: #FE8A24;
+  padding: 10px 30px;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+
+/* BUNGALOWS */
+.bungjar-main {
+  background-image: url('../../public/media/bungalow/Bungalow-Jardin-01.webp');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.bungsea-main {
+  background-image: url('../../public/media/bungalow/Bungalow-Mer-01.webp');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.main-item {
+  height: 60vh;
+}
+
+/* CAROUSEL */
+.btn-main-small {
+  background-color: #FE8A24;
+  padding: 4px 5px;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.3rem;
+  border: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-main-small:hover {
+  background-color: #09012B;
+  color: white;
+  transform: scale(1.05);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: #FE8A24;
+  border-radius: 30%;
+  padding: 15px;
+  opacity: 1 !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  opacity: 1 !important;
+  width: auto;
+  background: none !important;
+}
+
+.carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-control-next:hover .carousel-control-next-icon {
+  background-color: #09012B;
+  transform: scale(1.1);
+}
+
+/* mobile */
+.carousel-control-prev:active .carousel-control-prev-icon,
+.carousel-control-next:active .carousel-control-next-icon {
+  background-color: #09012B;
+  transform: scale(1.1);
+}
+
+/* Réservation  ***********/
+
+
+
+.hero-resa {
+  min-height: 30vh;
+  margin: 0;
+  position: flex;
+}
+
+.hero-resa-container-bg {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+/* Style des dates non disponibles - support navigateurs récents */
+input[type="date"]:invalid {
+  border-color: #dc3545;
+}
