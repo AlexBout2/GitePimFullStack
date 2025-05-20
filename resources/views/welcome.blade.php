@@ -92,10 +92,9 @@
                                     Laissez vous bercer par le son des vagues sur la terrasse !
                                 </h2>
                             </div>
-                            <button type="button" class="btn-main btn-lg fs-5 mt-2"
-                                onclick=" window.location.href='modules/chambre/chambre-index.html' ;">
+                            <a href="{{ route('chambres.index') }}" class="btn-main btn-lg fs-5 mt-2 text-center">
                                 En savoir +
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -123,13 +122,12 @@
                                                 <div class="card-body d-flex flex-column">
                                                     <h3 class="card-title">Visite du bagne</h3>
                                                     <p class="card-text flex-grow-1">Replongez avec notre guide dans
-                                                        l'histoire du pays sur l'île
-                                                        de
-                                                        Pam.</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/bagne/bagne-index.html';">
+                                                        l'histoire du pays sur l'île de Pam.
+                                                    </p>
+                                                    <a href="{{ route('bagne.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -142,11 +140,12 @@
                                                     <h3 class="card-title">Randonnée équestre</h3>
                                                     <p class="card-text flex-grow-1">De belles balades dans la nature
                                                         avec notre guide. À ne pas
-                                                        manquer !</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/cheval/cheval-index.html';">
+                                                        manquer !
+                                                    </p>
+                                                    <a href="{{ route('cheval.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -159,11 +158,12 @@
                                                     <h3 class="card-title">Notre garderie</h3>
                                                     <p class="card-text flex-grow-1">Nous garderons vos enfants si ils
                                                         sont trop petits pour
-                                                        certaines activités.</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/garderie/garderie-index.html';">
+                                                        certaines activités.
+                                                    </p>
+                                                    <a href="{{ route('garderie.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -182,11 +182,12 @@
                                                     <p class="card-text flex-grow-1">Balades détente ou sportive en
                                                         kayak sur le lagon. Vivez
                                                         notre
-                                                        lagon!</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/kayak/kayak-index.html';">
+                                                        lagon!
+                                                    </p>
+                                                    <a href="{{ route('kayak.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -200,11 +201,12 @@
                                                     <p class="card-text flex-grow-1">Pour les gourmets et les
                                                         gourmands, notre carte saura vous
                                                         ravir
-                                                        !</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/repas/repas-index.html';">
+                                                        !
+                                                    </p>
+                                                    <a href="{{ route('repas.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -217,11 +219,12 @@
                                                     <h3 class="card-title">Nos bungalows</h3>
                                                     <p class="card-text flex-grow-1">Jardin ou vue mer, choisissez
                                                         votre bungalow idéal pour votre
-                                                        séjour.</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/chambre/chambre-index.html';">
+                                                        séjour.
+                                                    </p>
+                                                    <a href="{{ route('chambres.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -259,10 +262,10 @@
                                                         l'histoire du pays sur l'île
                                                         de
                                                         Pam.</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/bagne/bagne-index.html';">
+                                                    <a href="{{ route('bagne.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -280,10 +283,10 @@
                                                     <p class="card-text flex-grow-1">De belles balades dans la nature
                                                         avec notre guide. À ne pas
                                                         manquer !</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/cheval/cheval-index.html';">
+                                                    <a href="{{ route('cheval.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -301,11 +304,12 @@
                                                     <p class="card-text flex-grow-1">Balades détente ou sportive en
                                                         kayak sur le lagon. Vivez
                                                         notre
-                                                        lagon!</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/kayak/kayak-index.html';">
+                                                        lagon!
+                                                    </p>
+                                                    <a href="{{ route('kayak.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -323,11 +327,12 @@
                                                     <p class="card-text flex-grow-1">Vous souhaitez réaliser les
                                                         activités entre adultes,
                                                         confiez-nous
-                                                        vos trésors.</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/garderie/garderie-index.html';">
+                                                        vos trésors.
+                                                    </p>
+                                                    <a href="{{ route('garderie.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -345,11 +350,12 @@
                                                     <p class="card-text flex-grow-1">Pour les gourmets et les
                                                         gourmands, notre carte saura vous
                                                         ravir
-                                                        !</p>
-                                                    <button type="button" class="btn-main-small btn-lg fs-6 mt-auto"
-                                                        onclick="window.location.href='modules/repas/repas-index.html';">
+                                                        !
+                                                    </p>
+                                                    <a href="{{ route('repas.index') }}"
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         En savoir +
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -366,9 +372,10 @@
                                                     <h3 class="card-title">Nos bungalows</h3>
                                                     <p class="card-text flex-grow-1">Jardin ou vue mer, choisissez
                                                         votre bungalow idéal pour votre
-                                                        séjour.</p>
+                                                        séjour.
+                                                    </p>
                                                     <a href="{{ route('chambres.create') }}"
-                                                        class="btn-main-small btn-lg fs-6 mt-auto">
+                                                        class="btn-main-small btn-lg fs-6 mt-auto text-center">
                                                         <span class="btn-text">En savoir +</span>
                                                     </a>
                                                 </div>
