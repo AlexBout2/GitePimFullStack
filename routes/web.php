@@ -7,6 +7,7 @@ use App\Http\Controllers\ChevalController;
 use App\Http\Controllers\KayakController;
 use App\Http\Controllers\BagneController;
 use App\Http\Controllers\GarderieController;
+use App\Http\Controllers\SejourController;
 
 // Route d'accueil
 Route::get('/', function () {
@@ -16,6 +17,8 @@ Route::get('/', function () {
 // Routes pour le module Chambres
 Route::get('/chambres', [ChambreController::class, 'index'])->name('chambres.index');
 Route::get('/chambres/create', [ChambreController::class, 'create'])->name('chambres.create');
+Route::get('/sejour/create', [SejourController::class, 'create'])->name('sejour.create');
+Route::post('/sejour', [SejourController::class, 'store'])->name('sejour.store');
 
 
 Route::get('/repas', [RepasController::class, 'index'])->name('repas.index');

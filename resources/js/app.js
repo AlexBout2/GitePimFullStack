@@ -3,4 +3,4 @@ import.meta.glob([
 ]);
 
 import './bootstrap';
-
+import './forms/bungalow-form.js';
