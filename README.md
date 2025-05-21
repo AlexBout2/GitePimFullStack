@@ -124,11 +124,9 @@ import laravel from 'laravel-vite-plugin';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css',
-                'resources/js/app.js',
-                //Style de Breeze
-                'resources/css/tailwind.css',
-                'resources/js/admin.js',
+            input: [
+                'resources/css/front.css',
+                'resources/js/front.js',
 
             ],
             refresh: true,
@@ -137,29 +135,37 @@ export default defineConfig({
 });
 ```
 
-il y a deux type d'import un pour l'application '@vite(['resources/css/app.css', 'resources/js/app.js'])' pour l'application. 
-Un dédié à breeze pour  pour l'authentification '@vite(['resources/css/tailwind.css', 'resources/js/admin.js'])'
+il y a deux type d'import un pour l'application '@vite(['resources/css/app.css', 'resources/js/app.js'])' 
+Un dédié à breeze pour l'administration
+ '@vite(['resources/css/front.css', 'resources/js/front.js'])'
+# Panel admin 
 
-## Authentification 
-[Breez + Blade](https://laravel.com/docs/11.x/starter-kits#breeze-and-blade) est utilisé poru l'authentifcation. 
+
+[Fillament](https://filamentphp.com/docs/3.x/panels/installation) est utilisé  pour le panel. Le package intègre déjà une gestion des utilsateur 
 L'installation de ce denier avec composer.
 
 ```
-composer require laravel/breeze --dev
+composer require filament/filament:"^3.3" -W
+
+php artisan filament:install --panels
 ```
 
+Un nouvelle utilisateur peut être crée 
+
 ```
-php artisan breeze:install
-
-php artisan migrate
-npm install
-npm run dev
+php artisan make:filament-user
 ```
+Les différents widgets sont dans app/Filament/Widgets/ et ces classes sont appeler dans 'app/Providers/Filament/AdminPanelProvider.php' 
+app/Filament/Widgets/Bungalows.php affiche les reservation des bungalow. 
 
+## Production
+A utiliser avant la production
+https://filamentphp.com/docs/3.x/panels/installation#deploying-to-production
 
-Une fois les assets recompiler la page est disponible sur 
-
-
+```
+php artisan filament:optimize
+```
+## Laravel install
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
