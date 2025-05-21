@@ -59,19 +59,18 @@
             <!-- Les 3 Photos des bungalows -->
             <div class="row">
                 <div class="col-md-12 mb-3">
-                    <img src="{{ Vite::asset('resources/media/chambres/Bungalow-Jardin-03.png') }}"
+                    <img src="{{ asset('media/bungalow/Bungalow-Jardin-03.png') }}"
                         class="card-img-top img-fluid rounded" alt="Bungalow-Jardin-03"
                         style="height: 300px; object-fit: cover">
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <img src="{{ Vite::asset('resources/media/chambres/Bungalow-Mer-03.png') }}"
-                        class="card-img-top img-fluid rounded" alt="Bungalow-Mer-03"
-                        style="height: 400px; object-fit: cover">
+                    <img src="{{ asset('media/bungalow/Bungalow-Mer-03.png') }}" class="card-img-top img-fluid rounded"
+                        alt="Bungalow-Mer-03" style="height: 400px; object-fit: cover">
                 </div>
                 <div class="col-md-8 mb-3">
-                    <img src="{{ Vite::asset('resources/media/chambres/Bungalow-Jardin-01.png') }}"
+                    <img src="{{ asset('media/bungalow/Bungalow-Jardin-01.webp') }}"
                         class="card-img-top img-fluid rounded" alt="Bungalow-Jardin-01"
                         style="height: 400px; object-fit: cover">
                 </div>
@@ -83,9 +82,8 @@
             <div class="col-12">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <img src="{{ Vite::asset('resources/media/chambres/Bungalow-Mer-01.png') }}"
-                            class="card-img-top img-fluid" alt="Bungalow-Mer-01"
-                            style="height: 400px; object-fit: cover">
+                        <img src="{{ asset('media/bungalow/Bungalow-Mer-01.webp') }}" class="card-img-top img-fluid"
+                            alt="Bungalow-Mer-01" style="height: 400px; object-fit: cover">
                     </div>
                     <article class="col-md-6">
                         <h1>Vivez une expérience unique face à l'océan.</h1>
@@ -104,12 +102,7 @@
         </section>
 
         <!-- Réservation -->
-        <section class="resa bg-image p-5 mt-0"
-            style="
-        background-image: url('{{ Vite::asset('resources/media/chambres/Footer-01.jpg') }}');
-        background-size: cover;
-        background-position: center;
-      ">
+        <section class="resa chambre-footer p-5 m-0">
             <div class="text-white col-12 col-md-8 align-self-center mx-auto glass-effect text-center" role="banner">
                 <h1 class="fs-2 fs-md-1 text-white">"N'attendez plus pour réserver"</h1>
                 <a href="{{ route('chambres.create') }}" class="btn-main mb-2">

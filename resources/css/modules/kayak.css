@@ -1,0 +1,219 @@
+@import url("https://unpkg.com/flickity@2/dist/flickity.min.css");
+
+/* Commun */
+body {
+    background-color: transparent;
+}
+
+h4 {
+    text-align: center;
+    color: var(--primary);
+    font-weight: bold;
+    border: 1px solid var(--primary);
+    width: fit-content;
+    margin: 20px auto;
+    padding: 10px 20px;
+    border-radius: 200px;
+}
+
+
+.hero .hero-container-kayak {
+    background-image: url("../../public/media/kayak/HeroKayak.webp");
+    background-position: 40% 80%;
+    background-position: no-repeat;
+    height: 70vh;
+
+}
+
+.hero-resa .hero-container-resa {
+    background-image: url("../../public/media/kayak/HeroKayak.webp");
+    background-position: 50% 60%;
+    height: 30vh;
+}
+
+
+
+/* Présentation de l'activité */
+
+/* Carousel */
+#galerie-kayak {
+    * {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .carousel {
+        background: transparent;
+        text-align: center;
+        height: 50vh;
+
+    }
+
+    .panneau {
+        position: relative;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        counter-increment: panneau;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .panneau img {
+        height: 100%;
+    }
+
+    .panneau-texte {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        color: white;
+        text-align: left;
+    }
+
+    .carousel.is-fullscreen .panneau {
+        height: 100%;
+    }
+
+}
+
+/* Styles spécifiques pour le carousel mobile */
+#galerie-kayak-mobile {
+    margin: 0 auto;
+    padding: 0;
+}
+
+#galerie-kayak-mobile .carousel {
+    height: auto;
+    margin-bottom: 20px;
+}
+
+#galerie-kayak-mobile .panneau {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 0 5px;
+    overflow: hidden;
+}
+
+#galerie-kayak-mobile .panneau img {
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+    object-fit: cover;
+    display: block;
+}
+
+#galerie-kayak-mobile .panneau-texte {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px;
+    font-size: 0.85rem;
+}
+
+#galerie-kayak-mobile .mobile-text {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 0;
+    margin: 0;
+}
+
+/* Assurez-vous que le texte est lisible */
+#galerie-kayak-mobile .mobile-text p {
+    margin: 0;
+    line-height: 1.3;
+    font-size: 0.9rem;
+}
+
+/* Styles pour les classes de visibilité responsive */
+@media (max-width: 767px) {
+    .not-mobile {
+        display: none !important;
+    }
+
+    .mobile {
+        display: block !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .not-mobile {
+        display: block !important;
+    }
+
+    .mobile {
+        display: none !important;
+    }
+}
+
+
+
+/* Consigne de sécurité */
+#securite {
+    height: fit-content;
+}
+
+#securite img {
+    width: 90%;
+}
+
+/* Section réservation */
+.resa {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 15px 25vw;
+    background-color: transparent;
+}
+
+/* Bouton "call to action" */
+.hero,
+.resa {
+    .btn {
+        background-color: var(--event);
+        color: var(--primary);
+    }
+
+    .btn:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+}
+
+
+.img-resa-kayak {
+    background-image: url("../../public/media/kayak/empty-kayak-boat-ship-tropical-beach-sea.webp");
+    background-position: 40% 80%;
+    height: 50vh;
+}
+
+.btn-danger,
+.btn-success {
+    font-weight: bold;
+    border-width: 2px;
+}
+
+.btn-danger {
+    color: red !important;
+}
+
+.btn-success {
+    color: green !important;
+}
+
+.formulaire {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    padding: 30px;
+    width: fit-content;
+    margin: auto;
+
+    div {
+        margin: 10px;
+    }
+}

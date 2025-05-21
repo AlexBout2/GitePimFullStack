@@ -23,6 +23,7 @@
 .hero .hero-container {
     background-image: url("../../public/media/bungalow/Hero-Cha1.jpg");
     background-position: 50% 50%;
+    background-size: cover;
     height: 70vh;
 }
 
@@ -33,4 +34,15 @@
     background-size: cover;
     width: 100%;
     height: 30vh;
+}
+
+.chambre-footer {
+    background-image: url("../../public/media/bungalow/Footer-01.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding: 3rem;
 }

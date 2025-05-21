@@ -8,6 +8,7 @@
 @import './modules/footer.css';
 @import './modules/navbar.css';
 @import './modules/chambre.css';
+@import './modules/kayak.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
