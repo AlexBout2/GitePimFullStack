@@ -4,15 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class Sejour extends Model
 {
     use HasFactory;
     
     protected $table = 'sejour';
-    
-    public $timestamps = false;
     
     protected $fillable = [
         'codeResaSejour',
@@ -22,14 +20,66 @@ class Sejour extends Model
         'nbrPersonnes'
     ];
     
-    protected static function boot()
+    /**
+     * Génère un code de réservation unique au format CH+YYMM+000x
+     */
+    public static function generateReservationCode($startDate)
     {
-        parent::boot();
+        $date = Carbon::parse($startDate);
+        $prefix = 'CH'; // Préfixe pour Chambre
+        $yearMonth = $date->format('ym'); // Format année-mois (comme 2505 pour mai 2025)
         
-        static::creating(function ($model) {
-            // Génération automatique du code de réservation pour le séjour
-            $model->codeResaSejour = 'SEJ-' . strtoupper(Str::random(6));
-        });
+        // Recherche du dernier code utilisé ce mois-ci
+        $lastCodeForMonth = self::where('codeResaSejour', 'like', $prefix . $yearMonth . '%')
+            ->orderBy('codeResaSejour', 'desc')
+            ->value('codeResaSejour');
+        
+        if ($lastCodeForMonth) {
+            // Extraction du numéro séquentiel et incrémentation
+            $lastNumber = (int)substr($lastCodeForMonth, -4);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+        
+        // Formatage avec zéros à gauche
+        $sequential = str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        
+        return $prefix . $yearMonth . $sequential;
+    }
+    
+    /**
+     * Vérifie si le nombre de personnes est compatible avec le type de bungalow
+     */
+    public static function isValidOccupancy($bungalowId, $nbrPersonnes)
+    {
+        $bungalow = Bungalow::findOrFail($bungalowId);
+        
+        // Vérification spécifique pour les bungalows côté mer (max 2 personnes)
+        if ($bungalow->typeBungalow == 'mer' && $nbrPersonnes > 2) {
+            return false;
+        }
+        
+        // Vérification générale de capacité
+        return $nbrPersonnes <= $bungalow->capacite;
+    }
+    
+    /**
+     * Crée une nouvelle réservation
+     */
+    public static function createReservation($bungalowId, $startDate, $endDate, $nbrPersonnes)
+    {
+        $codeResaSejour = self::generateReservationCode($startDate);
+        
+        $sejour = new self();
+        $sejour->codeResaSejour = $codeResaSejour;
+        $sejour->bungalowId = $bungalowId;
+        $sejour->startDate = $startDate;
+        $sejour->endDate = $endDate;
+        $sejour->nbrPersonnes = $nbrPersonnes;
+        $sejour->save();
+        
+        return $sejour;
     }
     
     /**
@@ -38,66 +88,5 @@ class Sejour extends Model
     public function bungalow()
     {
         return $this->belongsTo(Bungalow::class, 'bungalowId');
-    }
-    
-    /**
-     * Relations avec les différentes activités
-     */
-    public function kayaks()
-    {
-        return $this->hasMany(Kayak::class, 'sejourId');
-    }
-    
-    public function randosCheval()
-    {
-        return $this->hasMany(RandoCheval::class, 'sejourId');
-    }
-    
-    public function restaurants()
-    {
-        return $this->hasMany(Restaurant::class, 'sejourId');
-    }
-    
-    public function garderies()
-    {
-        return $this->hasMany(Garderie::class, 'sejourId');
-    }
-    
-    public function bagnes()
-    {
-        return $this->hasMany(Bagne::class, 'sejourId');
-    }
-    
-    /**
-     * Vérifie si le séjour est en cours ou à venir
-     */
-    public function getEstActifAttribute()
-    {
-        return $this->endDate >= date('Y-m-d');
-    }
-    
-    /**
-     * Obtenir toutes les réservations d'activités associées au séjour
-     * Utile pour une page admin de récapitulatif
-     */
-    public function getAllActivites()
-    {
-        $activites = [
-            'kayaks' => $this->kayaks()->get(),
-            'randosCheval' => $this->randosCheval()->get(),
-            'restaurants' => $this->restaurants()->get(),
-            'garderies' => $this->garderies()->get(),
-            'bagnes' => $this->bagnes()->get()
-        ];
-        
-        return $activites;
-    }
-    
-    /**
-     * Trouve un séjour par son code de réservation
-     */
-    public static function findByCode($codeResaSejour)
-    {
-        return self::where('codeResaSejour', $codeResaSejour)->first();
     }
 }

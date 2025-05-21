@@ -19,6 +19,5 @@ class ChambreController extends Controller
         $bungalowsJardin = Bungalow::where('typeBungalow', 'jardin')->get();
         return view('chambres.create', compact('bungalowsMer', 'bungalowsJardin'));
 
-
     }
 }

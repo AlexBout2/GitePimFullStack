@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Bungalow;
 use App\Models\Sejour;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class SejourController extends Controller
@@ -36,13 +35,13 @@ class SejourController extends Controller
             'nbrPersonnes' => 'required|integer|min:1|max:4',
         ]);
         
-        // Vérifier que le nombre de personnes est compatible avec le type de bungalow
         $bungalow = Bungalow::findOrFail($validated['bungalowId']);
         
-        if ($bungalow->typeBungalow == 'mer' && $validated['nbrPersonnes'] > 2) {
+        // Vérifier la compatibilité du nombre de personnes
+        if (!Sejour::isValidOccupancy($validated['bungalowId'], $validated['nbrPersonnes'])) {
             return back()
                 ->withInput()
-                ->withErrors(['nbrPersonnes' => 'Les bungalows côté mer peuvent accueillir maximum 2 personnes.']);
+                ->withErrors(['nbrPersonnes' => 'Le nombre de personnes dépasse la capacité du bungalow sélectionné.']);
         }
         
         // Vérifier disponibilité
@@ -52,27 +51,22 @@ class SejourController extends Controller
                 ->withErrors(['bungalowId' => 'Ce bungalow n\'est pas disponible pour les dates sélectionnées.']);
         }
         
-        // Générer un code de réservation unique
-        $codeResaSejour = 'S-' . strtoupper(Str::random(6));
-        
         // Créer la réservation
-        $sejour = new Sejour();
-        $sejour->codeResaSejour = $codeResaSejour;
-        $sejour->bungalowId = $validated['bungalowId'];
-        $sejour->startDate = $validated['startDate'];
-        $sejour->endDate = $validated['endDate'];
-        $sejour->nbrPersonnes = $validated['nbrPersonnes'];
-        $sejour->save();
+        $sejour = Sejour::createReservation(
+            $validated['bungalowId'],
+            $validated['startDate'],
+            $validated['endDate'],
+            $validated['nbrPersonnes']
+        );
         
         // Rediriger avec confirmation
-return redirect()->route('chambres.create')
-    ->with([
-        'codeResaSejour' => $codeResaSejour,
-        'typeBungalow' => $validated['typeBungalow'],
-        'startDate' => $validated['startDate'],
-        'endDate' => $validated['endDate'],
-        'nbrPersonnes' => $validated['nbrPersonnes'],
-    ]);
-
+        return redirect()->route('chambres.create')
+            ->with([
+                'codeResaSejour' => $sejour->codeResaSejour,
+                'typeBungalow' => $bungalow->typeBungalow,
+                'startDate' => $validated['startDate'],
+                'endDate' => $validated['endDate'],
+                'nbrPersonnes' => $validated['nbrPersonnes'],
+            ]);
     }
 }

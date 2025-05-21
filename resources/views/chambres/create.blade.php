@@ -12,7 +12,7 @@
 
     <meta name="description" content="Réservez une chambre dans notre gîte">
     <meta name="author" content="Gîte Pim">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="keywords" content="gîte, Poum, Nouvelle-Calédonie, bungalows">
     <meta name="geo.region" content="NC">
     <meta name="geo.placename" content="Poum">
@@ -78,6 +78,16 @@
                             </div>
                         </div>
 
+                        <hr class="my-4" style="opacity: 0.3;">
+
+                          <!-- Sélection du nombre de personnes -->
+                        <x-person-counter :personCount="old('nbrPersonnes', 2)" :minPersons="1" :maxPersons="old('typeBungalow') == 'mer' ? 2 : 4"
+                            fieldName="nbrPersonnes" label="Nombre de personnes" :capaciteInfo="old('typeBungalow') == 'mer'
+                                ? 'Capacité maximale: 2 personnes par bungalow mer'
+                                : (old('typeBungalow') == 'jardin'
+                                    ? 'Capacité maximale: 4 personnes par bungalow jardin'
+                                    : 'Capacité par bungalow')" />
+                                    
                         <hr class="my-4" style="opacity: 0.3;">
 
                         <!-- Sélection du type de bungalow -->

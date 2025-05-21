@@ -1,11 +1,11 @@
 USE gitePim;
--- Création de la table bungalow
 CREATE TABLE bungalow (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codeBungalow VARCHAR(4) UNIQUE NOT NULL COMMENT 'Identifiant unique métier (ex: ME01, JA01)',
     typeBungalow ENUM('Mer', 'Jardin') NOT NULL COMMENT 'Type de bungalow (Mer ou Jardin)',
     capacite INT NOT NULL COMMENT 'Capacité du bungalow (2 ou 4 personnes)'
 );
+
 -- Insertion des bungalows Mer (tous avec 2 places, de ME01 à ME05)
 INSERT INTO bungalow (codeBungalow, typeBungalow, capacite) VALUES 
 ('ME01', 'Mer', 2),
@@ -28,18 +28,28 @@ INSERT INTO bungalow (codeBungalow, typeBungalow, capacite) VALUES
 ('JA10', 'Jardin', 4);
 
 
--- Création de la table sejour
+
+-- Table SEJOUR (sans la référence directe au bungalow)
 CREATE TABLE sejour (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codeResaSejour VARCHAR(10) UNIQUE NOT NULL COMMENT 'Format: CHYYMM000x - identifiant unique métier',
-    bungalowId INT NOT NULL COMMENT 'Référence au bungalow associé',
     startDate DATE NOT NULL COMMENT 'Date de début du séjour',
     endDate DATE NOT NULL COMMENT 'Date de fin du séjour',
-    nbrPersonnes INT NOT NULL COMMENT 'Nombre de personnes pour ce séjour',
-    FOREIGN KEY (bungalowId) REFERENCES bungalow(id) ON DELETE RESTRICT,
+    nbrPersonnes INT NOT NULL COMMENT 'Nombre total de personnes pour ce séjour',
     CONSTRAINT chk_dates CHECK (endDate > startDate),
     CONSTRAINT chk_nbrPersonnes CHECK (nbrPersonnes > 0)
 );
+
+-- Table de liaison SEJOUR_BUNGALOW
+CREATE TABLE sejour_bungalow (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sejourId INT NOT NULL,
+    bungalowId INT NOT NULL,
+    FOREIGN KEY (sejourId) REFERENCES sejour(id) ON DELETE CASCADE,
+    FOREIGN KEY (bungalowId) REFERENCES bungalow(id) ON DELETE RESTRICT,
+    CONSTRAINT unique_sejour_bungalow UNIQUE(sejourId, bungalowId)
+);
+
 
 -- Création de la table restaurant
 CREATE TABLE restaurant (
