@@ -27,7 +27,7 @@
     <meta property="og:site_name" content="Gîte Pim">
 
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/front.css', 'resources/js/front.js'])
     <link rel="canonical" href="{{ route('chambres.create') }}">
 </head>
 
@@ -49,7 +49,7 @@
                     <form class="col-md-6 col-11 mx-auto reservation-form mt-4" action="{{ route('sejour.store') }}"
                         method="POST">
                         @csrf
-                        <x-form-errors />
+
 
                         <x-date-selector mode="range" label="À quelle date voulez-vous réserver ?"
                             startLabel="Début du séjour" endLabel="Date fin" :startDate="old('startDate')" :endDate="old('endDate')" />
@@ -130,6 +130,8 @@
                             @enderror
                             <div id="jardin-availability-message" class="text-danger mt-2 text-center"></div>
                         </div>
+
+                        <x-form-errors />
 
                         <hr class="my-4" style="opacity: 0.3;">
 

@@ -27,11 +27,16 @@ class SejourController extends Controller
      */
     public function checkAvailability(Request $request)
     {
-        return AvailabilityChecker::checkBungalowAvailability(
-            $request->input('bungalowId'),
-            $request->input('startDate'),
-            $request->input('endDate')
-        );
+            $request->input('bungalowId');
+            $request->input('startDate');
+            $request->input('endDate'); 
+            
+            $checker = new \App\Utils\AvailabilityChecker();
+            $available = $checker->checkBungalowAvailability($bungalowId, $startDate, $endDate);
+    return response()->json([
+        'available' => $available
+    ]);
+ 
     }
 
     public function store(Request $request)
@@ -110,8 +115,8 @@ class SejourController extends Controller
             $sejour = $result[1];
             $codeResaSejour = $result[3];
             
-            // Calcul de la durée pour l'affichage
-            $duration = Carbon::parse($validated['endDate'])->diffInDays(Carbon::parse($validated['startDate']));
+            // Calcul de la durée du séjour
+            $duration = Carbon::parse($validated['startDate'])->diffInDays(Carbon::parse($validated['endDate']));
             
             // Redirection avec message de succès
             return redirect()->route('chambres.create')->with([

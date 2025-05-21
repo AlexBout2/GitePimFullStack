@@ -26,7 +26,7 @@
     <meta property="og:site_name" content="Gîte Pim">
 
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/front.css', 'resources/js/front.js'])
 
     <link rel="canonical" href="{{ route('chambres.index') }}">
 </head>

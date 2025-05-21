@@ -106,6 +106,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Réinitialiser l'état de disponibilité
+    function resetBungalowAvailability() {
+        // Réinitialiser les options de bungalow mer
+        if (bungalowMerSelect) {
+            Array.from(bungalowMerSelect.options).forEach(option => {
+                if (option.value) { // Ignore l'option placeholder
+                    option.disabled = false;
+                    option.removeAttribute('title');
+                    option.style.color = '';
+                }
+            });
+        }
+
+        // Réinitialiser les options de bungalow jardin
+        if (bungalowJardinSelect) {
+            Array.from(bungalowJardinSelect.options).forEach(option => {
+                if (option.value) { // Ignore l'option placeholder
+                    option.disabled = false;
+                    option.removeAttribute('title');
+                    option.style.color = '';
+                }
+            });
+        }
+
+        // Effacer les messages d'erreur
+        const merMessage = document.getElementById('mer-availability-message');
+        const jardinMessage = document.getElementById('jardin-availability-message');
+
+        if (merMessage) merMessage.textContent = '';
+        if (jardinMessage) jardinMessage.textContent = '';
+    }
+
     // Mettre à jour la disponibilité des bungalows en fonction des dates
     function updateBungalowAvailability() {
         const startDate = startDateInput ? startDateInput.value : null;
@@ -113,16 +145,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!startDate || !endDate) return;
 
-        // Cette fonction devrait faire une requête AJAX pour vérifier la disponibilité
-        // Pour l'instant, on simule simplement le comportement
-        console.log(`Vérification de disponibilité pour la période du ${startDate} au ${endDate}`);
+        // Réinitialiser l'état des options de bungalow
+        resetBungalowAvailability();
 
-        // Dans une implémentation complète, on ferait une requête AJAX ici
-        // fetch('/api/check-availability?startDate=' + startDate + '&endDate=' + endDate)
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         // Mettre à jour l'interface avec les données reçues
-        //     });
+        // Vérifier la disponibilité pour les bungalows Mer
+        if (bungalowMerSelect) {
+            Array.from(bungalowMerSelect.options).forEach(option => {
+                if (option.value) { // Ignorer l'option placeholder
+                    checkSingleBungalow(option.value, startDate, endDate, option, 'mer');
+                }
+            });
+        }
+
+        // Vérifier la disponibilité pour les bungalows Jardin
+        if (bungalowJardinSelect) {
+            Array.from(bungalowJardinSelect.options).forEach(option => {
+                if (option.value) { // Ignorer l'option placeholder
+                    checkSingleBungalow(option.value, startDate, endDate, option, 'jardin');
+                }
+            });
+        }
+    }
+
+    // Vérifier la disponibilité d'un seul bungalow
+    function checkSingleBungalow(bungalowId, startDate, endDate, optionElement, type) {
+        fetch(`/check-bungalow-availability?bungalowId=${bungalowId}&startDate=${startDate}&endDate=${endDate}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.available) {
+                    // Bungalow non disponible
+                    optionElement.disabled = true;
+                    optionElement.setAttribute('title', 'Non disponible pour ces dates');
+                    optionElement.style.color = '#aaa';
+
+                    // Mettre à jour le message si ce bungalow est sélectionné
+                    const selectedValue = (type === 'mer' && bungalowMerSelect) ?
+                        bungalowMerSelect.value :
+                        (type === 'jardin' && bungalowJardinSelect) ? bungalowJardinSelect.value : '';
+
+                    if (selectedValue === bungalowId) {
+                        const messageContainer = type === 'mer' ?
+                            document.getElementById('mer-availability-message') :
+                            document.getElementById('jardin-availability-message');
+
+                        if (messageContainer) {
+                            messageContainer.textContent = 'Ce bungalow n\'est pas disponible pour les dates sélectionnées';
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la vérification de disponibilité:', error);
+            });
     }
 
     // Initialisation
@@ -142,6 +216,8 @@ document.addEventListener('DOMContentLoaded', function () {
         updateBungalowOptions();
     }
 
-    // Vérifier la disponibilité initiale
-    updateBungalowAvailability();
+    // Vérifier la disponibilité initiale si les dates sont déjà définies
+    if (startDateInput && startDateInput.value && endDateInput && endDateInput.value) {
+        updateBungalowAvailability();
+    }
 });

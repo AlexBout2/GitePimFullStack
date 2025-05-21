@@ -1,3 +1,165 @@
+# Requirements 
+
+System d'exploitation : 
+Linux Ubuntu-24.04 avec WSL2
+
+
+Curl 
+```
+sudo apt update && install
+sudo apt install curl git
+```
+
+Npm 
+
+```
+sudo apt install nodejs npm 
+```
+
+```
+node -v
+```
+
+```
+npm -v
+```
+# My SQL
+
+Installer mysql server et client
+
+```
+sudo apt install mysql-server mysql-client -y
+
+sudo systemctl status mysql
+```
+
+## Paramètrage sql pour wsl 
+ 
+```
+sudo mysql -u root
+CREATE DATABASE gitePim;
+CREATE USER 'dev'@'%' IDENTIFIED BY 'NXC2Z2ApU0qqCv';
+GRANT ALL PRIVILEGES ON gitePim.* TO 'dev'@'%';
+FLUSH PRIVILEGES;
+```
+
+##  Mysql workbench 
+
+```
+Host: localhost
+user: dev
+mdp: 'NXC2Z2ApU0qqCv'
+```
+
+# Laravel install 
+
+Php composer et laravel installer serront directement télécharger via cette commande fournis par [Laravel](https://laravel.com/docs/11.x/installation#installing-php)
+
+```
+/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.4)"
+```
+
+Rafraichir le terminal 
+
+```
+. ~/.bashrc
+```
+
+Installer Laravel
+```
+composer global require laravel/installer
+```
+
+## Attention
+
+Crée l'application
+```
+laravel new gitPim-app
+```
+
+Pick up du repo
+```
+git clone https://github.com/AlexBout2/GitePimFullStack.git
+```
+
+## Installation des dépendances 
+
+```
+composer install 
+```
+
+```
+npm install 
+```
+
+Dans boite de dialogue : 
+
+```
+none 
+MySQL
+no
+no
+```
+
+Modifier le .env
+
+```.env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=gitPim
+DB_USERNAME=dev
+DB_PASSWORD=NXC2Z2ApU0qqCv
+```
+
+#  Application
+
+## Asset front end. 
+
+Les assettes front en sont compiler par vite. 
+```vite.config.js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css',
+                'resources/js/app.js',
+                //Style de Breeze
+                'resources/css/tailwind.css',
+                'resources/js/admin.js',
+
+            ],
+            refresh: true,
+        }),
+    ],
+});
+```
+
+il y a deux type d'import un pour l'application '@vite(['resources/css/app.css', 'resources/js/app.js'])' pour l'application. 
+Un dédié à breeze pour  pour l'authentification '@vite(['resources/css/tailwind.css', 'resources/js/admin.js'])'
+
+## Authentification 
+[Breez + Blade](https://laravel.com/docs/11.x/starter-kits#breeze-and-blade) est utilisé poru l'authentifcation. 
+L'installation de ce denier avec composer.
+
+```
+composer require laravel/breeze --dev
+```
+
+```
+php artisan breeze:install
+
+php artisan migrate
+npm install
+npm run dev
+```
+
+
+Une fois les assets recompiler la page est disponible sur 
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

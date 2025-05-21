@@ -32,7 +32,7 @@
 
 
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/front.css', 'resources/js/front.js'])
 
 
     <!-- Canonical URL (importante pour éviter le contenu dupliqué) -->
