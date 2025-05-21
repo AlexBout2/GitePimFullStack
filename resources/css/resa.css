@@ -33,3 +33,16 @@
     border-color: var(--secondary);
     box-shadow: 0 0 0 0.2rem rgba(96, 91, 241, 0.25);
 }
+
+/* À ajouter dans votre CSS */
+.bg-event {
+    background-color: rgb(254, 138, 36);
+    color: white;
+    /* pour assurer la lisibilité du texte sur fond orange */
+}
+
+.bg-secondary {
+    background-color: rgb(96, 91, 241);
+    color: white;
+    /* pour assurer la lisibilité du texte sur fond violet */
+}

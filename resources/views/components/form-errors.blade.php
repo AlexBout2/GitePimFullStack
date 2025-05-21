@@ -5,20 +5,20 @@
 ])
 
 @if ($errors->any())
-    <div class="alert alert-info">
-        <p class="mb-2 text-center">{{ $title }}</p>
-        <ul class="mb-0">
+    <div class="alert bg-secondary">
+        <p class="mb-2 fs-5">{{ $title }}</p>
+        <div class="text-center fs-5 bg-event">
             @if ($showAll)
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                    <div>{{ $error }}</div>
                 @endforeach
             @else
                 @foreach ($fields as $field)
                     @error($field)
-                        <li>{{ $message }}</li>
+                        <div>{{ $message }}</div>
                     @enderror
                 @endforeach
             @endif
-        </ul>
+        </div>
     </div>
 @endif
