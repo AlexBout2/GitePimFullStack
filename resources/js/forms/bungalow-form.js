@@ -1,151 +1,147 @@
+// resources/js/forms/bungalow-form.js
 document.addEventListener('DOMContentLoaded', function () {
-    // Éléments DOM
-    const bungalowMer = document.getElementById('bungalowMer');
-    const bungalowJardin = document.getElementById('bungalowJardin');
+    // Éléments du formulaire
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const bungalowMerInput = document.getElementById('bungalowMer');
+    const bungalowJardinInput = document.getElementById('bungalowJardin');
     const bungalowMerContainer = document.getElementById('bungalowMerContainer');
     const bungalowJardinContainer = document.getElementById('bungalowJardinContainer');
     const bungalowMerSelect = document.getElementById('bungalowMerSelect');
     const bungalowJardinSelect = document.getElementById('bungalowJardinSelect');
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
-    const personSelect = document.getElementById('nbrPersonnes');
+    const personCount = document.getElementById('personCount');
 
-    // Fonction pour mettre à jour la date de fin minimale
-    function updateEndDateMin() {
-        if (startDateInput && endDateInput && startDateInput.value) {
-            endDateInput.min = startDateInput.value;
-            // Si la date de fin est avant la date de début, réinitialiser
-            if (endDateInput.value && new Date(endDateInput.value) < new Date(startDateInput.value)) {
-                endDateInput.value = startDateInput.value;
-            }
-        }
-    }
-
-    // Fonction pour l'affichage des options de bungalow et gestion des sélecteurs
-    function updateBungalowOptions() {
-        if (!bungalowMer || !bungalowJardin || !bungalowMerContainer || !bungalowJardinContainer) return;
-
-        if (bungalowMer.checked) {
-            // Afficher le conteneur mer et cacher le conteneur jardin
-            bungalowMerContainer.classList.remove('d-none');
-            bungalowJardinContainer.classList.add('d-none');
-
-            // Gérer les sélecteurs si présents
-            if (bungalowMerSelect && bungalowJardinSelect) {
-                bungalowMerSelect.disabled = false;
-                bungalowJardinSelect.disabled = true;
-                bungalowJardinSelect.value = '';
-            }
-        } else if (bungalowJardin.checked) {
-            // Afficher le conteneur jardin et cacher le conteneur mer
-            bungalowMerContainer.classList.add('d-none');
-            bungalowJardinContainer.classList.remove('d-none');
-
-            // Gérer les sélecteurs si présents
-            if (bungalowMerSelect && bungalowJardinSelect) {
-                bungalowJardinSelect.disabled = false;
-                bungalowMerSelect.disabled = true;
-                bungalowMerSelect.value = '';
-            }
-        } else {
-            // Si aucun n'est coché, tout cacher
-            bungalowMerContainer.classList.add('d-none');
-            bungalowJardinContainer.classList.add('d-none');
-        }
-
-        updatePersonCount();
-    }
-
-    // Fonction pour l'affichage dynamique du nombre de personnes
-    function updatePersonCount() {
-        if (!bungalowJardin || !personSelect) return;
-
-        const isTerre = bungalowJardin.checked;
-        const maxPersons = isTerre ? 4 : 2; // 4 pour jardin, 2 pour mer
-
-        // Vider le sélecteur
-        while (personSelect.options.length > 0) {
-            personSelect.options.remove(0);
-        }
-
-        // Ajouter les options selon le type de bungalow
-        for (let i = 1; i <= maxPersons; i++) {
-            let opt = document.createElement('option');
-            opt.value = i;
-            opt.innerHTML = i + (i > 1 ? ' personnes' : ' personne');
-            personSelect.appendChild(opt);
-        }
-    }
-
-    // Fonction pour afficher l'image du bungalow sélectionné
-    function showBungalowImage(selectElement, type) {
-        const containerId = `bungalow${type.charAt(0).toUpperCase() + type.slice(1)}ImageContainer`;
-        const imageId = `bungalow${type.charAt(0).toUpperCase() + type.slice(1)}Image`;
-
-        const container = document.getElementById(containerId);
-        const imageElement = document.getElementById(imageId);
-
-        if (!container || !imageElement) return;
-
-        if (selectElement.value) {
-            // Une option est sélectionnée, afficher l'image
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const imagePath = selectedOption.getAttribute('data-image');
-
-            if (imagePath) {
-                imageElement.src = imagePath;
-                container.classList.remove('d-none');
-            } else {
-                container.classList.add('d-none');
-            }
-        } else {
-            // Aucune option sélectionnée, cacher l'image
-            container.classList.add('d-none');
-        }
-    }
-
-    // Initialiser l'affichage des images au chargement (si un bungalow est déjà sélectionné)
-    if (bungalowMerSelect && bungalowMerSelect.value) {
-        showBungalowImage(bungalowMerSelect, 'mer');
-    }
-
-    if (bungalowJardinSelect && bungalowJardinSelect.value) {
-        showBungalowImage(bungalowJardinSelect, 'jardin');
-    }
-
-    // Ajouter les écouteurs pour les changements de sélection
-    if (bungalowMerSelect) {
-        bungalowMerSelect.addEventListener('change', function () {
-            showBungalowImage(this, 'mer');
-        });
-    }
-
-    if (bungalowJardinSelect) {
-        bungalowJardinSelect.addEventListener('change', function () {
-            showBungalowImage(this, 'jardin');
-        });
-    }
-
-    // Ajouter les écouteurs d'événements
+    // Définir la date minimale (aujourd'hui) pour les champs de date
+    const today = new Date().toISOString().split('T')[0];
     if (startDateInput) {
-        startDateInput.addEventListener('change', updateEndDateMin);
-        updateEndDateMin(); // Initialisation
+        startDateInput.min = today;
+    }
+    if (endDateInput) {
+        endDateInput.min = today;
     }
 
-    if (bungalowMer) {
-        bungalowMer.addEventListener('change', updateBungalowOptions);
+    // Mise à jour des dates
+    if (startDateInput) {
+        startDateInput.addEventListener('change', function () {
+            if (endDateInput) {
+                endDateInput.min = startDateInput.value;
+
+                if (endDateInput.value && new Date(endDateInput.value) < new Date(startDateInput.value)) {
+                    endDateInput.value = startDateInput.value;
+                }
+            }
+
+            updateBungalowAvailability();
+        });
     }
 
-    if (bungalowJardin) {
-        bungalowJardin.addEventListener('change', updateBungalowOptions);
+    if (endDateInput) {
+        endDateInput.addEventListener('change', function () {
+            updateBungalowAvailability();
+        });
     }
 
-    // Initialiser l'état d'affichage
+    // Fonction pour actualiser les options de bungalow en fonction du choix
+    function updateBungalowOptions() {
+        if (bungalowMerInput && bungalowJardinInput) {
+            if (bungalowMerInput.checked) {
+                bungalowMerContainer.classList.remove('d-none');
+                bungalowJardinContainer.classList.add('d-none');
+                // Réinitialiser la sélection de jardin
+                if (bungalowJardinSelect) {
+                    bungalowJardinSelect.selectedIndex = 0;
+                }
+            } else if (bungalowJardinInput.checked) {
+                bungalowMerContainer.classList.add('d-none');
+                bungalowJardinContainer.classList.remove('d-none');
+                // Réinitialiser la sélection de mer
+                if (bungalowMerSelect) {
+                    bungalowMerSelect.selectedIndex = 0;
+                }
+            } else {
+                bungalowMerContainer.classList.add('d-none');
+                bungalowJardinContainer.classList.add('d-none');
+            }
+            updatePersonCount();
+        }
+    }
+
+    // Fonction pour mettre à jour les options de nombre de personnes
+    function updatePersonCount() {
+        const personCountSelect = document.getElementById('personCount');
+        const isJardin = bungalowJardinInput && bungalowJardinInput.checked;
+
+        if (personCountSelect) {
+            // Conserver la sélection actuelle si possible
+            const currentValue = personCountSelect.value;
+
+            // Vider le select
+            personCountSelect.innerHTML = '';
+
+            // Déterminer le max en fonction du type de bungalow
+            const maxPersons = isJardin ? 4 : 2;
+
+            // Recréer les options
+            for (let i = 1; i <= maxPersons; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + ' ' + (i > 1 ? 'personnes' : 'personne');
+                personCountSelect.appendChild(option);
+            }
+
+            // Restaurer la valeur précédente si possible, sinon utiliser la valeur max
+            if (parseInt(currentValue) <= maxPersons) {
+                personCountSelect.value = currentValue;
+            } else {
+                personCountSelect.value = maxPersons;
+            }
+
+            // Mettre à jour le texte d'information de capacité
+            const capaciteInfoElement = personCountSelect.parentElement.nextElementSibling;
+            if (capaciteInfoElement && capaciteInfoElement.tagName.toLowerCase() === 'p') {
+                capaciteInfoElement.querySelector('small').textContent = isJardin
+                    ? 'Les bungalows Jardin peuvent accueillir jusqu\'à 4 personnes'
+                    : 'Les bungalows Mer sont limités à 2 personnes maximum';
+            }
+        }
+    }
+
+    // Mettre à jour la disponibilité des bungalows en fonction des dates
+    function updateBungalowAvailability() {
+        const startDate = startDateInput ? startDateInput.value : null;
+        const endDate = endDateInput ? endDateInput.value : null;
+
+        if (!startDate || !endDate) return;
+
+        // Cette fonction devrait faire une requête AJAX pour vérifier la disponibilité
+        // Pour l'instant, on simule simplement le comportement
+        console.log(`Vérification de disponibilité pour la période du ${startDate} au ${endDate}`);
+
+        // Dans une implémentation complète, on ferait une requête AJAX ici
+        // fetch('/api/check-availability?startDate=' + startDate + '&endDate=' + endDate)
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         // Mettre à jour l'interface avec les données reçues
+        //     });
+    }
+
+    // Initialisation
     updateBungalowOptions();
 
-    // Si on a une session flash, faire défiler jusqu'à la confirmation
-    const confirmElement = document.querySelector('.confirm-resa');
-    if (confirmElement) {
-        confirmElement.scrollIntoView({ behavior: 'smooth' });
+    // Ajouter les écouteurs d'événements
+    if (bungalowMerInput) {
+        bungalowMerInput.addEventListener('change', updateBungalowOptions);
     }
+
+    if (bungalowJardinInput) {
+        bungalowJardinInput.addEventListener('change', updateBungalowOptions);
+    }
+
+    // Recharger l'état du formulaire si des valeurs existent déjà (par exemple, après validation échouée)
+    if ((bungalowMerInput && bungalowMerInput.checked) || (bungalowJardinInput && bungalowJardinInput.checked)) {
+        updateBungalowOptions();
+    }
+
+    // Vérifier la disponibilité initiale
+    updateBungalowAvailability();
 });

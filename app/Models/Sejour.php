@@ -5,12 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Utils\ReservationCodeGenerator;
 
 class Sejour extends Model
 {
     use HasFactory;
     
     protected $table = 'sejour';
+    
+    // Désactiver les timestamps automatiques
+    public $timestamps = false;
     
     protected $fillable = [
         'codeResaSejour',
@@ -22,64 +27,113 @@ class Sejour extends Model
     
     /**
      * Génère un code de réservation unique au format CH+YYMM+000x
+     *
+     * @param string $startDate
+     * @return string
      */
     public static function generateReservationCode($startDate)
     {
-        $date = Carbon::parse($startDate);
-        $prefix = 'CH'; // Préfixe pour Chambre
-        $yearMonth = $date->format('ym'); // Format année-mois (comme 2505 pour mai 2025)
-        
-        // Recherche du dernier code utilisé ce mois-ci
-        $lastCodeForMonth = self::where('codeResaSejour', 'like', $prefix . $yearMonth . '%')
-            ->orderBy('codeResaSejour', 'desc')
-            ->value('codeResaSejour');
-        
-        if ($lastCodeForMonth) {
-            // Extraction du numéro séquentiel et incrémentation
-            $lastNumber = (int)substr($lastCodeForMonth, -4);
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-        
-        // Formatage avec zéros à gauche
-        $sequential = str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-        
-        return $prefix . $yearMonth . $sequential;
+        $generator = new ReservationCodeGenerator();
+        return $generator->generateCode(
+            'sejour',           // Nom de la table
+            'CH',               // Préfixe pour les chambres
+            'codeResaSejour',   // Nom du champ contenant le code
+            $startDate          // Date de départ
+        );
     }
     
     /**
-     * Vérifie si le nombre de personnes est compatible avec le type de bungalow
+     * Vérifie si le bungalow est disponible pour la période donnée
+     *
+     * @param int $bungalowId
+     * @param string $startDate
+     * @param string $endDate
+     * @return bool
      */
-    public static function isValidOccupancy($bungalowId, $nbrPersonnes)
+    public static function isBungalowAvailable($bungalowId, $startDate, $endDate)
     {
-        $bungalow = Bungalow::findOrFail($bungalowId);
+        $startDate = Carbon::parse($startDate)->startOfDay();
+        $endDate = Carbon::parse($endDate)->endOfDay();
         
-        // Vérification spécifique pour les bungalows côté mer (max 2 personnes)
-        if ($bungalow->typeBungalow == 'mer' && $nbrPersonnes > 2) {
-            return false;
-        }
-        
-        // Vérification générale de capacité
-        return $nbrPersonnes <= $bungalow->capacite;
+        // Recherche de réservations qui se chevauchent
+        $existingBooking = self::where('bungalowId', $bungalowId)
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('startDate', [$startDate, $endDate])
+                    ->orWhereBetween('endDate', [$startDate, $endDate])
+                    ->orWhere(function ($q) use ($startDate, $endDate) {
+                        $q->where('startDate', '<=', $startDate)
+                          ->where('endDate', '>=', $endDate);
+                    });
+            })
+            ->first();
+            
+        // Si aucune réservation existante n'est trouvée, le bungalow est disponible
+        return $existingBooking === null;
     }
     
     /**
-     * Crée une nouvelle réservation
+     * Vérifie si les dates sont valides pour une réservation
+     * 
+     * @param string $startDate
+     * @param string $endDate
+     * @return array [bool $isValid, string $errorMessage]
      */
-    public static function createReservation($bungalowId, $startDate, $endDate, $nbrPersonnes)
+    public static function validateDates($startDate, $endDate)
     {
-        $codeResaSejour = self::generateReservationCode($startDate);
+        $today = Carbon::today();
+        $startCarbon = Carbon::parse($startDate);
+        $endCarbon = Carbon::parse($endDate);
         
-        $sejour = new self();
-        $sejour->codeResaSejour = $codeResaSejour;
-        $sejour->bungalowId = $bungalowId;
-        $sejour->startDate = $startDate;
-        $sejour->endDate = $endDate;
-        $sejour->nbrPersonnes = $nbrPersonnes;
-        $sejour->save();
+        // Vérifier que la date de début est supérieure ou égale à aujourd'hui
+        if ($startCarbon->lt($today)) {
+            return [false, 'La date de début doit être égale ou postérieure à aujourd\'hui.'];
+        }
         
-        return $sejour;
+        // Vérifier que la date de fin est supérieure à la date de début
+        if ($endCarbon->lte($startCarbon)) {
+            return [false, 'La date de fin doit être postérieure à la date de début.'];
+        }
+        
+        return [true, ''];
+    }
+    
+    /**
+     * Crée une nouvelle réservation en vérifiant les contraintes
+     * 
+     * @param array $data Les données de réservation (bungalowId, startDate, endDate, nbrPersonnes)
+     * @return array [bool $success, Sejour|null $sejour, string $message, string $code]
+     */
+    public static function createValidatedReservation($data)
+    {
+        // 1 & 2. Valider les dates
+        $dateValidation = self::validateDates($data['startDate'], $data['endDate']);
+        if (!$dateValidation[0]) {
+            return [false, null, $dateValidation[1], ''];
+        }
+        
+        // 3. Vérifier la disponibilité du bungalow
+        if (!self::isBungalowAvailable($data['bungalowId'], $data['startDate'], $data['endDate'])) {
+            return [false, null, 'Ce bungalow n\'est pas disponible pour les dates sélectionnées.', ''];
+        }
+        
+        // 4. Créer le code de réservation
+        $codeResaSejour = self::generateReservationCode($data['startDate']);
+        
+        // Créer la réservation
+        try {
+            $sejour = self::create([
+                'codeResaSejour' => $codeResaSejour,
+                'bungalowId' => $data['bungalowId'],
+                'startDate' => $data['startDate'],
+                'endDate' => $data['endDate'],
+                'nbrPersonnes' => $data['nbrPersonnes']
+            ]);
+            
+            // 5. Retourner le succès avec le numéro de réservation
+            return [true, $sejour, 'Réservation créée avec succès.', $codeResaSejour];
+        } catch (\Exception $e) {
+            return [false, null, 'Erreur lors de la création de la réservation: ' . $e->getMessage(), ''];
+        }
     }
     
     /**
