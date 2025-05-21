@@ -5,9 +5,10 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'resources/css/tailwind.css',
-                'resources/js/admin.js'
-
+                'resources/css/app.css',
+                'resources/js/app.js',
+                'resources/css/front.css',
+                'resources/js/front.js'
             ],
             refresh: true,
         }),
