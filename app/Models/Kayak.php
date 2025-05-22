@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Utils\NumSejourValidator;
 use App\Utils\ReservationCodeGenerator;
+use Illuminate\Support\Facades\DB;
 
 class KayakReservation extends Model
 {
@@ -45,22 +46,56 @@ class KayakReservation extends Model
         
         $sejourId = $sejourValidation['sejourId'];
         
-        // 2. Générer un code unique pour cette réservation
+        // 2. Vérifier la capacité totale disponible dans la table capaciteactivites
+        $capaciteSimples = DB::table('capaciteactivites')
+                            ->where('typeActivite', 'like', 'KayakSimple')
+                            ->value('nombreUnites');
+                            
+        $capaciteDoubles = DB::table('capaciteactivites')
+                            ->where('typeActivite', 'like', 'KayakDouble')
+                            ->value('nombreUnites');
+        
+        if ($capaciteSimples === null || $capaciteDoubles === null) {
+            throw new \Exception("Impossible de déterminer la capacité des kayaks disponibles.");
+        }
+        
+        // 3. Vérifier les réservations existantes pour cette date et heure
+        $reservationsExistantes = self::where('date', $data['date'])
+                                     ->where('heure_debut', $data['heure_debut'])
+                                     ->where('statut', 'confirmé')
+                                     ->get();
+        
+        $simplesReserves = $reservationsExistantes->sum('nombre_kayaks_simples');
+        $doublesReserves = $reservationsExistantes->sum('nombre_kayaks_doubles');
+        
+        $simplesDisponibles = $capaciteSimples - $simplesReserves;
+        $doublesDisponibles = $capaciteDoubles - $doublesReserves;
+        
+        // Vérifier si assez de kayaks disponibles
+        if ($simplesDisponibles < $data['nbr_kayaks_simples']) {
+            throw new \Exception("Désolé, il n'y a pas assez de kayaks simples disponibles pour cette période.");
+        }
+        
+        if ($doublesDisponibles < $data['nbr_kayaks_doubles']) {
+            throw new \Exception("Désolé, il n'y a pas assez de kayaks doubles disponibles pour cette période.");
+        }
+        
+        // 4. Générer un code unique pour cette réservation
         $codeGenerator = new ReservationCodeGenerator();
         $reservationCode = $codeGenerator->generateCode(
             'kayak_reservations',
-            'KA',  // Préfixe pour les kayaks
+            'KA',  // Préfixe pour les kayaks (corrigé de KY à KA)
             'code',
             $data['date']
         );
         
-        // 3. Créer la réservation
+        // 5. Créer la réservation
         return self::create([
             'code' => $reservationCode,
             'sejour_id' => $sejourId,
             'date' => $data['date'],
             'heure_debut' => $data['heure_debut'],
-            'duree' => $data['duree'],
+            'duree' => 1,
             'nombre_personnes' => $data['nbrPersonnes'],
             'nombre_kayaks_simples' => $data['nbr_kayaks_simples'],
             'nombre_kayaks_doubles' => $data['nbr_kayaks_doubles'],

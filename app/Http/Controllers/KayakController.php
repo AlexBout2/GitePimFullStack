@@ -107,8 +107,8 @@ class KayakController extends Controller
         } catch (\Exception $e) {
             // En cas d'erreur lors de l'enregistrement
             return back()
-                ->withInput()
-                ->withErrors(['system' => 'Une erreur est survenue lors du traitement de votre réservation. Veuillez réessayer.']);
+            ->withInput()
+            ->withErrors(['system' => $e->getMessage()]);
         }
     }
 }

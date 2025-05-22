@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const kayakFormContainer = document.getElementById("kayak-form-container");
     const kayakForm = document.getElementById("kayak-reservation-form");
     const dateInput = document.getElementById("date");
-    const nbPersonnesSelect = document.getElementById("nb_personnes");
-    const nbKayakSimpleInput = document.getElementById("nb_kayak_simple");
-    const nbKayakDoubleInput = document.getElementById("nb_kayak_double");
+    const nbPersonnesSelect = document.getElementById("nbrPersonnes");  // Attention au nom du champ
+    const nbKayakSimpleInput = document.getElementById("nbr_kayaks_simples");  // Ajuster selon vos noms de champs
+    const nbKayakDoubleInput = document.getElementById("nbr_kayaks_doubles");  // Ajuster selon vos noms de champs
     const heureDebutSelect = document.getElementById("heure_debut");
     const kayakError = document.getElementById("kayak-error");
     const hourAvailabilityMessage = document.getElementById("hour-availability-message");
@@ -17,45 +17,58 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!kayakForm) return; // Quitter si le formulaire n'existe pas
 
     // Vérification du numéro de séjour
-    sejourValidationBtn.addEventListener("click", function () {
-        const sejourNumber = sejourInput.value.trim();
+    if (sejourValidationBtn) {
+        sejourValidationBtn.addEventListener("click", function () {
+            const sejourNumber = sejourInput.value.trim();
 
-        if (!sejourNumber) {
-            sejourInput.classList.add("is-invalid");
-            return;
-        }
+            if (!sejourNumber) {
+                sejourInput.classList.add("is-invalid");
+                return;
+            }
 
-        // Validation du séjour (simulée ici, à remplacer par appel AJAX)
-        validateSejour(sejourNumber);
-    });
+            // Il y a un conflit entre les deux approches de validation dans votre code
+            // Utilisons l'approche directe plutôt que l'event binding jQuery
+            validateSejour(sejourNumber);
+        });
+    }
 
     function validateSejour(sejourNumber) {
-        $('.sejour-validation').on('click', function () {
-            const sejourNumber = $('#sejour-number').val();
-            const activityDate = $('#date').val();
 
-            $.ajax({
-                url: "{{ route('sejour.validate') }}",
-                type: "POST",
-                data: {
-                    sejour_number: sejourNumber,
-                    date: activityDate,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function (response) {
-                    if (response.valid) {
-                        // Afficher un message de succès
-                        // Déverrouiller le reste du formulaire
-                    } else {
-                        // Afficher l'erreur
-                        $('#sejour-number').addClass('is-invalid');
-                        $('.invalid-feedback').text(response.message).show();
-                    }
+        // Récupérer le token CSRF depuis la balise meta
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        // Préparer les données
+        const activityDate = dateInput ? dateInput.value : '';
+
+        // Utiliser l'API Fetch avec les principes de Laravel
+        fetch('/sejour/validate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                sejour_number: sejourNumber,
+                date: activityDate
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    showKayakForm(sejourNumber);
+                } else {
+                    sejourInput.classList.add("is-invalid");
+                    const feedback = sejourInput.nextElementSibling;
+                    if (feedback) feedback.textContent = data.message || "Numéro de séjour invalide";
                 }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la validation du séjour:', error);
+                sejourInput.classList.add("is-invalid");
+                const feedback = sejourInput.nextElementSibling;
+                if (feedback) feedback.textContent = "Erreur lors de la validation. Veuillez réessayer.";
             });
-        });
-
-        showKayakForm(sejourNumber);
     }
 
     function showKayakForm(sejourNumber) {
@@ -73,25 +86,27 @@ document.addEventListener("DOMContentLoaded", function () {
     setupKayakCounters();
 
     // Validation dynamique
-    nbPersonnesSelect.addEventListener("change", validateKayakDistribution);
-    nbKayakSimpleInput.addEventListener("change", validateKayakDistribution);
-    nbKayakDoubleInput.addEventListener("change", validateKayakDistribution);
+    if (nbPersonnesSelect) nbPersonnesSelect.addEventListener("change", validateKayakDistribution);
+    if (nbKayakSimpleInput) nbKayakSimpleInput.addEventListener("change", validateKayakDistribution);
+    if (nbKayakDoubleInput) nbKayakDoubleInput.addEventListener("change", validateKayakDistribution);
 
     // Validation de la disponibilité des horaires
-    heureDebutSelect.addEventListener("change", validateHoraireDisponibilite);
-    dateInput.addEventListener("change", validateHoraireDisponibilite);
+    if (heureDebutSelect) heureDebutSelect.addEventListener("change", validateHoraireDisponibilite);
+    if (dateInput) dateInput.addEventListener("change", validateHoraireDisponibilite);
 
     // Validation du formulaire avant soumission
-    kayakForm.addEventListener("submit", function (event) {
-        // Réexécuter les validations
-        const kayakValid = validateKayakDistribution();
-        const horaireValid = validateHoraireDisponibilite();
+    if (kayakForm) {
+        kayakForm.addEventListener("submit", function (event) {
+            // Réexécuter les validations
+            const kayakValid = validateKayakDistribution();
+            const horaireValid = validateHoraireDisponibilite();
 
-        // Empêcher la soumission si une validation échoue
-        if (!kayakValid || !horaireValid) {
-            event.preventDefault();
-        }
-    });
+            // Empêcher la soumission si une validation échoue
+            if (!kayakValid || !horaireValid) {
+                event.preventDefault();
+            }
+        });
+    }
 
     // Configuration des compteurs de kayaks
     function setupKayakCounters() {
@@ -116,16 +131,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Validation de la distribution des kayaks
     function validateKayakDistribution() {
+        if (!nbPersonnesSelect || !nbKayakSimpleInput || !nbKayakDoubleInput) return true;
+
         const nbPersonnes = parseInt(nbPersonnesSelect.value);
         const nbKayakSimple = parseInt(nbKayakSimpleInput.value);
         const nbKayakDouble = parseInt(nbKayakDoubleInput.value);
 
         // Réinitialiser l'erreur
-        kayakError.textContent = "";
+        if (kayakError) kayakError.textContent = "";
 
         // Aucun kayak sélectionné
         if (nbKayakSimple === 0 && nbKayakDouble === 0) {
-            kayakError.textContent = "Veuillez sélectionner au moins un kayak";
+            if (kayakError) kayakError.textContent = "Veuillez sélectionner au moins un kayak";
             return false;
         }
 
@@ -136,18 +153,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Vérifier si la capacité correspond au nombre de personnes
         if (capaciteTotale < nbPersonnes) {
-            kayakError.textContent = `Les kayaks sélectionnés ne peuvent accueillir que ${capaciteTotale} personne(s)`;
+            if (kayakError) kayakError.textContent = `Les kayaks sélectionnés ne peuvent accueillir que ${capaciteTotale} personne(s)`;
             return false;
         }
 
         if (capaciteTotale > nbPersonnes) {
-            kayakError.textContent = `${nbPersonnes} personne(s) pour ${capaciteTotale} places. Ajoutez des personnes ou réduisez le nombre de kayaks.`;
+            if (kayakError) kayakError.textContent = `${nbPersonnes} personne(s) pour ${capaciteTotale} places. Ajoutez des personnes ou réduisez le nombre de kayaks.`;
             return false;
         }
 
         // Vérifier si une personne seule essaie de réserver un kayak double
         if (nbPersonnes === 1 && nbKayakDouble > 0 && nbKayakSimple === 0) {
-            kayakError.textContent = "Les personnes seules ne peuvent pas réserver uniquement des kayaks doubles";
+            if (kayakError) kayakError.textContent = "Les personnes seules ne peuvent pas réserver uniquement des kayaks doubles";
             return false;
         }
 
@@ -155,42 +172,16 @@ document.addEventListener("DOMContentLoaded", function () {
         return true;
     }
 
-    // Validation de la disponibilité de l'horaire (simulée)
+    // Validation de la disponibilité de l'horaire
     function validateHoraireDisponibilite() {
-        if (!dateInput.value || !heureDebutSelect.value) {
+        if (!dateInput || !heureDebutSelect || !dateInput.value || !heureDebutSelect.value) {
             // Pas assez d'informations pour valider
-            hourAvailabilityMessage.textContent = "";
+            if (hourAvailabilityMessage) hourAvailabilityMessage.textContent = "";
             return true;
         }
 
-        const selectedDate = dateInput.value;
-        const selectedHour = heureDebutSelect.value;
-
-        // Simulation de vérification de disponibilité
-        // Dans une implémentation réelle, on ferait une requête AJAX
-
-        // Exemple de requête AJAX (à décommenter et adapter)
-        /*
-        fetch(`/api/check-kayak-availability?date=${selectedDate}&hour=${selectedHour}`)
-            .then(response => response.json())
-            .then(data => {
-                if (!data.available) {
-                    hourAvailabilityMessage.textContent = "Cet horaire n'est plus disponible. Veuillez en choisir un autre.";
-                    return false;
-                } else {
-                    hourAvailabilityMessage.textContent = "";
-                    return true;
-                }
-            })
-            .catch(() => {
-                // Gérer les erreurs
-                hourAvailabilityMessage.textContent = "Erreur lors de la vérification de disponibilité.";
-                return false;
-            });
-        */
-
         // Pour l'exemple, nous considérons tous les horaires comme disponibles
-        hourAvailabilityMessage.textContent = "";
+        if (hourAvailabilityMessage) hourAvailabilityMessage.textContent = "";
         return true;
     }
 });
