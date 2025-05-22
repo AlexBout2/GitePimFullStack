@@ -19,14 +19,56 @@ class KayakController extends Controller
         return view('kayak.create');
     }
 
+public function validateSejourNumber(Request $request)
+    {
+        try {
+            $numSejour = $request->input('sejour_number');
+            
+            if (empty($numSejour)) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'Le numéro de séjour est requis'
+                ]);
+            }
+            
+            // Validation du numéro de séjour uniquement
+            $sejourValidation = NumSejourValidator::validateSejour($numSejour);
+            
+            return response()->json($sejourValidation);
+        } catch (\Exception $e) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Erreur lors de la validation: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Valide le séjour et la date d'activité (utilisée pour la validation finale)
+     */
     public function validateSejour(Request $request)
     {
-        $numSejour = $request->input('sejour_number');
-        $dateActivite = $request->input('date');
-        
-        $sejourValidation = NumSejourValidator::validateForActivity($numSejour, $dateActivite);
-        
-        return response()->json($sejourValidation);
+        try {
+            $numSejour = $request->input('sejour_number');
+            $dateActivite = $request->input('date');
+
+            if (empty($dateActivite)) {
+                return response()->json([
+                    'valid' => false, 
+                    'message' => 'La date est requise'
+                ]);
+            }
+            
+            // Validation complète (séjour + date)
+            $sejourValidation = NumSejourValidator::validateForActivity($numSejour, $dateActivite);
+            
+            return response()->json($sejourValidation);
+        } catch (\Exception $e) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Erreur lors de la validation: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**

@@ -34,7 +34,7 @@ class KayakReservation extends Model
      */
     public static function createReservation(array $data)
     {
-        // 1. Valider le numéro de séjour et récupérer le séjour associé
+        // 1. Valider le numéro de séjour et la date pour l'activité
         $sejourValidation = NumSejourValidator::validateForActivity(
             $data['sejour_number'], 
             $data['date']
@@ -84,7 +84,7 @@ class KayakReservation extends Model
         $codeGenerator = new ReservationCodeGenerator();
         $reservationCode = $codeGenerator->generateCode(
             'kayak_reservations',
-            'KA',  // Préfixe pour les kayaks (corrigé de KY à KA)
+            'KA',  // Préfixe pour les kayaks
             'code',
             $data['date']
         );

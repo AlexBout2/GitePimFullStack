@@ -33,15 +33,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function validateSejour(sejourNumber) {
-
         // Récupérer le token CSRF depuis la balise meta
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        // Préparer les données
-        const activityDate = dateInput ? dateInput.value : '';
-
-        // Utiliser l'API Fetch avec les principes de Laravel
-        fetch('/sejour/validate', {
+        // Utiliser l'API Fetch pour valider uniquement le numéro de séjour
+        fetch('/validate-sejour-number', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -49,11 +45,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                sejour_number: sejourNumber,
-                date: activityDate
+                sejour_number: sejourNumber
             })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.valid) {
                     showKayakForm(sejourNumber);
@@ -70,6 +70,59 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (feedback) feedback.textContent = "Erreur lors de la validation. Veuillez réessayer.";
             });
     }
+
+    function validateDateForSejour() {
+        const sejourNumber = sejourHidden.value;
+        const selectedDate = dateInput.value;
+
+        if (!sejourNumber || !selectedDate) return;
+
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('/validate-sejour', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                sejour_number: sejourNumber,
+                date: selectedDate
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.valid) {
+                    dateInput.classList.add("is-invalid");
+                    // Afficher le message d'erreur près du champ de date
+                    const dateErrorElement = document.getElementById("date-error") ||
+                        document.createElement("div");
+
+                    dateErrorElement.id = "date-error";
+                    dateErrorElement.className = "invalid-feedback d-block text-center";
+                    dateErrorElement.textContent = data.message;
+
+                    if (!document.getElementById("date-error")) {
+                        dateInput.parentNode.appendChild(dateErrorElement);
+                    }
+                } else {
+                    dateInput.classList.remove("is-invalid");
+                    const dateError = document.getElementById("date-error");
+                    if (dateError) dateError.remove();
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la validation de la date:', error);
+            });
+    }
+
+    // Ajouter un écouteur d'événement pour la date
+    if (dateInput) {
+        dateInput.addEventListener('change', validateDateForSejour);
+    }
+
+
 
     function showKayakForm(sejourNumber) {
         sejourInput.classList.remove("is-invalid");

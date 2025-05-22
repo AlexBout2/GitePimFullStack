@@ -36,5 +36,5 @@ Route::get('/garderie', [GarderieController::class, 'index'])->name('garderie.in
 
 Route::get('/check-bungalow-availability', [SejourController::class, 'checkAvailability'])
     ->name('bungalow.check-availability');
-Route::post('/validate-sejour', [KayakController::class, 'validateSejour'])
-    ->name('sejour.validate');
+Route::post('/validate-sejour-number', [KayakController::class, 'validateSejourNumber'])->name('validate.sejour.number');
+Route::post('/validate-sejour', [KayakController::class, 'validateSejour'])->name('validate.sejour');

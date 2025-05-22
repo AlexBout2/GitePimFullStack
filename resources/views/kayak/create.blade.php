@@ -17,6 +17,7 @@
     <meta name="keywords" content="gîte, Poum, Nouvelle-Calédonie, kayak, lagon, location">
     <meta name="geo.region" content="NC">
     <meta name="geo.placename" content="Poum">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <meta property="og:title" content="Gîte Pim - Location de kayak à Poum">
     <meta property="og:description" content="Réservez un kayak pour explorer le lagon">
