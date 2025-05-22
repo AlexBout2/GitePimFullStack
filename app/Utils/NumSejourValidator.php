@@ -7,70 +7,66 @@ use Carbon\Carbon;
 
 class NumSejourValidator
 {
-    /**
-     * Vérifie si un numéro de séjour est valide
-     *
-     * @param string $numSejour Le numéro de séjour à vérifier
-     * @return array Un tableau contenant le statut de validation et un message
-     */
-    public static function validateSejour(string $numSejour): array
+    public static function validateSejour($sejourNumber)
     {
-        // Vérifier l'existence du numéro de séjour
-        $sejour = Sejour::where('codeResaSejour', $numSejour)->first();
+        // CORRECTION: Utiliser codeResaSejour au lieu de num_sejour
+        $sejour = Sejour::where('codeResaSejour', $sejourNumber)->first();
         
         if (!$sejour) {
             return [
                 'valid' => false,
-                'message' => 'Numéro de séjour invalide. Vérifiez votre numéro et réessayez.'
+                'message' => 'Ce numéro de séjour n\'existe pas.',
+                'sejourId' => null
             ];
         }
         
-        // Si tout est valide, renvoyer un statut positif avec les infos du séjour
         return [
             'valid' => true,
-            'message' => 'Numéro de séjour validé.',
-            'sejour' => [
-                'id' => $sejour->id,
-                'dateArrivee' => $sejour->dateArrivee,
-                'dateDepart' => $sejour->dateDepart
-            ]
+            'message' => 'Séjour validé avec succès.',
+            'sejourId' => $sejour->id
         ];
     }
     
-    /**
-     * Vérifie si une date d'activité est dans la période du séjour
-     *
-     * @param string $numSejour Le numéro de séjour à vérifier
-     * @param string $dateActivite La date prévue pour l'activité
-     * @return array Un tableau contenant le statut de validation et un message
-     */
-    public static function validateForActivity(string $numSejour, string $dateActivite): array
+    public static function validateForActivity($sejourNumber, $activityDate = null)
     {
-        // D'abord vérifier le séjour lui-même
-        $sejourValidation = self::validateSejour($numSejour);
+        // CORRECTION: Utiliser codeResaSejour au lieu de num_sejour
+        $sejour = Sejour::where('codeResaSejour', $sejourNumber)->first();
         
-        if (!$sejourValidation['valid']) {
-            return $sejourValidation;
-        }
-        
-        // Vérifier si la date d'activité est comprise dans la période de séjour
-        $dateActivite = Carbon::parse($dateActivite);
-        $startDate = Carbon::parse($sejourValidation['sejour']['dateArrivee']);
-        $endDate = Carbon::parse($sejourValidation['sejour']['dateDepart']);
-        
-        if ($dateActivite->lt($startDate) || $dateActivite->gt($endDate)) {
+        if (!$sejour) {
             return [
                 'valid' => false,
-                'message' => 'La date de réservation doit être comprise dans votre période de séjour (' . 
-                             $startDate->format('d/m/Y') . ' au ' . $endDate->format('d/m/Y') . ').'
+                'message' => 'Ce numéro de séjour n\'existe pas.',
+                'sejourId' => null
             ];
         }
+
+        // Si une date d'activité est fournie, vérifier qu'elle est dans la période du séjour
+        if ($activityDate) {
+            try {
+                $dateActivite = Carbon::parse($activityDate);
+                $dateDebut = Carbon::parse($sejour->startDate);
+                $dateFin = Carbon::parse($sejour->endDate);
+                
+                if ($dateActivite->lt($dateDebut) || $dateActivite->gt($dateFin)) {
+                    return [
+                        'valid' => false,
+                        'message' => "La date de réservation doit être comprise dans votre période de séjour ({$dateDebut->format('d/m/Y')} au {$dateFin->format('d/m/Y')}).",
+                        'sejourId' => null
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'valid' => false,
+                    'message' => "Erreur lors de la validation des dates: " . $e->getMessage(),
+                    'sejourId' => null
+                ];
+            }
+        }
         
-        // Si tout est valide, renvoyer un statut positif
         return [
             'valid' => true,
-            'message' => 'Date de réservation valide pour ce séjour.',
-            'sejourId' => $sejourValidation['sejour']['id']
+            'message' => 'Séjour et date validés avec succès.',
+            'sejourId' => $sejour->id
         ];
     }
 }

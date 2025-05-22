@@ -150,13 +150,38 @@ document.addEventListener("DOMContentLoaded", function () {
     // Validation du formulaire avant soumission
     if (kayakForm) {
         kayakForm.addEventListener("submit", function (event) {
+            // Toujours empêcher la soumission par défaut
+            event.preventDefault();
+
             // Réexécuter les validations
             const kayakValid = validateKayakDistribution();
             const horaireValid = validateHoraireDisponibilite();
+            const dateValid = !!dateInput.value && !dateInput.classList.contains("is-invalid");
 
-            // Empêcher la soumission si une validation échoue
-            if (!kayakValid || !horaireValid) {
-                event.preventDefault();
+            // Si toutes les validations sont réussies
+            if (kayakValid && horaireValid && dateValid) {
+                // Vérifier si tous les champs requis sont remplis
+                const allFieldsFilled = [
+                    dateInput.value,
+                    heureDebutSelect.value,
+                    nbPersonnesSelect.value,
+                    // Au moins un des deux types de kayak doit être > 0
+                    (parseInt(nbKayakSimpleInput.value) > 0 || parseInt(nbKayakDoubleInput.value) > 0)
+                ].every(Boolean);
+
+                if (allFieldsFilled) {
+                    // Soumettre le formulaire manuellement si tout est valide
+                    this.submit();
+                } else {
+                    // Afficher un message d'erreur général
+                    alert('Veuillez remplir tous les champs requis.');
+                }
+            } else {
+                // Faire défiler jusqu'à la première erreur
+                const firstError = document.querySelector(".is-invalid, .text-danger:not(:empty)");
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         });
     }

@@ -4,110 +4,110 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Utils\NumSejourValidator;
-use App\Utils\ReservationCodeGenerator;
-use Illuminate\Support\Facades\DB;
 
-class KayakReservation extends Model
+class Kayak extends Model
 {
     use HasFactory;
 
-    protected $table = 'kayak_reservations';
+    // Spécifier le nom de la table explicitement
+    protected $table = 'kayak';
     
+    // Définir les champs qui peuvent être assignés en masse
     protected $fillable = [
-        'code',
-        'sejour_id',
-        'date',
-        'heure_debut',
-        'duree',
-        'nombre_personnes',
-        'nombre_kayaks_simples',
-        'nombre_kayaks_doubles',
-        'statut'
+        'codeResaKayak',
+        'dateReservation',
+        'creneauKayak',
+        'nbKayakSimple',
+        'nbKayakDouble',
+        'nbPersonnesTotales',
+        'sejourId'
     ];
-
-    /**
-     * Crée une nouvelle réservation de kayak après validation des données
-     *
-     * @param array $data Les données validées du formulaire
-     * @return KayakReservation
-     */
-    public static function createReservation(array $data)
-    {
-        // 1. Valider le numéro de séjour et la date pour l'activité
-        $sejourValidation = NumSejourValidator::validateForActivity(
-            $data['sejour_number'], 
-            $data['date']
-        );
-        
-        if (!$sejourValidation['valid']) {
-            throw new \Exception($sejourValidation['message']);
-        }
-        
-        $sejourId = $sejourValidation['sejourId'];
-        
-        // 2. Vérifier la capacité totale disponible dans la table capaciteactivites
-        $capaciteSimples = DB::table('capaciteactivites')
-                            ->where('typeActivite', 'like', 'KayakSimple')
-                            ->value('nombreUnites');
-                            
-        $capaciteDoubles = DB::table('capaciteactivites')
-                            ->where('typeActivite', 'like', 'KayakDouble')
-                            ->value('nombreUnites');
-        
-        if ($capaciteSimples === null || $capaciteDoubles === null) {
-            throw new \Exception("Impossible de déterminer la capacité des kayaks disponibles.");
-        }
-        
-        // 3. Vérifier les réservations existantes pour cette date et heure
-        $reservationsExistantes = self::where('date', $data['date'])
-                                     ->where('heure_debut', $data['heure_debut'])
-                                     ->where('statut', 'confirmé')
-                                     ->get();
-        
-        $simplesReserves = $reservationsExistantes->sum('nombre_kayaks_simples');
-        $doublesReserves = $reservationsExistantes->sum('nombre_kayaks_doubles');
-        
-        $simplesDisponibles = $capaciteSimples - $simplesReserves;
-        $doublesDisponibles = $capaciteDoubles - $doublesReserves;
-        
-        // Vérifier si assez de kayaks disponibles
-        if ($simplesDisponibles < $data['nbr_kayaks_simples']) {
-            throw new \Exception("Désolé, il n'y a pas assez de kayaks simples disponibles pour cette période.");
-        }
-        
-        if ($doublesDisponibles < $data['nbr_kayaks_doubles']) {
-            throw new \Exception("Désolé, il n'y a pas assez de kayaks doubles disponibles pour cette période.");
-        }
-        
-        // 4. Générer un code unique pour cette réservation
-        $codeGenerator = new ReservationCodeGenerator();
-        $reservationCode = $codeGenerator->generateCode(
-            'kayak_reservations',
-            'KA',  // Préfixe pour les kayaks
-            'code',
-            $data['date']
-        );
-        
-        // 5. Créer la réservation
-        return self::create([
-            'code' => $reservationCode,
-            'sejour_id' => $sejourId,
-            'date' => $data['date'],
-            'heure_debut' => $data['heure_debut'],
-            'duree' => 1,
-            'nombre_personnes' => $data['nbrPersonnes'],
-            'nombre_kayaks_simples' => $data['nbr_kayaks_simples'],
-            'nombre_kayaks_doubles' => $data['nbr_kayaks_doubles'],
-            'statut' => 'confirmé'  // Statut par défaut
-        ]);
-    }
     
-    /**
-     * Relation avec le modèle Sejour
-     */
+    // Si vos colonnes de date/heure doivent être converties en objets Carbon
+    protected $dates = [
+        'dateReservation'
+    ];
+    
+    // Relation avec le séjour
     public function sejour()
     {
-        return $this->belongsTo(Sejour::class, 'sejour_id');
+        return $this->belongsTo(Sejour::class, 'sejourId');
+    }
+    
+    // Méthode statique pour vérifier la disponibilité
+    public static function checkAvailability($date, $creneau)
+    {
+        // Récupérer la capacité totale depuis la table capaciteactivites
+        $capaciteSimples = \DB::table('capaciteactivites')
+                           ->where('typeActivite', 'KayakSimple')
+                           ->value('nombreUnites');
+                           
+        $capaciteDoubles = \DB::table('capaciteactivites')
+                           ->where('typeActivite', 'KayakDouble')
+                           ->value('nombreUnites');
+        
+        // Récupérer les kayaks déjà réservés pour cette date et ce créneau
+        $reservations = self::where('dateReservation', $date)
+                           ->where('creneauKayak', $creneau)
+                           ->get();
+        
+        $simplesReserves = $reservations->sum('nbKayakSimple');
+        $doublesReserves = $reservations->sum('nbKayakDouble');
+        
+        return [
+            'simplesDisponibles' => $capaciteSimples - $simplesReserves,
+            'doublesDisponibles' => $capaciteDoubles - $doublesReserves,
+            'creneauDisponible' => ($simplesDisponibles > 0 || $doublesDisponibles > 0)
+        ];
+    }
+    
+    // Méthode pour créer une nouvelle réservation de kayak
+    public static function createReservation($data)
+    {
+        // Vérifier que le séjour existe
+        $sejour = Sejour::where('codeResaSejour', $data['sejour_number'])->first();
+        if (!$sejour) {
+            throw new \Exception("Le séjour spécifié n'existe pas.");
+        }
+        
+        // Vérifier que la date est dans la période du séjour
+        $dateReservation = \Carbon\Carbon::parse($data['date']);
+        $startDate = \Carbon\Carbon::parse($sejour->startDate);
+        $endDate = \Carbon\Carbon::parse($sejour->endDate);
+        
+        if ($dateReservation->lt($startDate) || $dateReservation->gt($endDate)) {
+            throw new \Exception("La date de réservation doit être comprise dans votre période de séjour ({$startDate->format('d/m/Y')} au {$endDate->format('d/m/Y')}).");
+        }
+        
+        // Vérifier la disponibilité
+        $disponibilite = self::checkAvailability($data['date'], $data['creneauKayak']);
+        
+        if ($data['nbr_kayaks_simples'] > $disponibilite['simplesDisponibles']) {
+            throw new \Exception("Il n'y a pas assez de kayaks simples disponibles pour cette date et ce créneau.");
+        }
+        
+        if ($data['nbr_kayaks_doubles'] > $disponibilite['doublesDisponibles']) {
+            throw new \Exception("Il n'y a pas assez de kayaks doubles disponibles pour cette date et ce créneau.");
+        }
+        
+        // Générer un code de réservation unique
+        $codeGenerator = new \App\Utils\ReservationCodeGenerator();
+        $reservationCode = $codeGenerator->generateCode(
+            'kayak',
+            'KA',
+            'codeResaKayak',
+            $data['date']
+        );
+        
+        // Créer la réservation
+        return self::create([
+            'codeResaKayak' => $reservationCode,
+            'dateReservation' => $data['date'],
+            'creneauKayak' => $data['creneauKayak'],
+            'nbKayakSimple' => $data['nbr_kayaks_simples'],
+            'nbKayakDouble' => $data['nbr_kayaks_doubles'],
+            'nbPersonnesTotales' => $data['nbrPersonnes'],
+            'sejourId' => $sejour->id
+        ]);
     }
 }

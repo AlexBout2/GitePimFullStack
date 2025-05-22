@@ -205,15 +205,3 @@ h4 {
 .btn-success {
     color: green !important;
 }
-
-.formulaire {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 50px;
-    padding: 30px;
-    width: fit-content;
-    margin: auto;
-
-    div {
-        margin: 10px;
-    }
-}

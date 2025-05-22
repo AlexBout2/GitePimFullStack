@@ -151,7 +151,7 @@
                         <x-form-errors />
 
                         <div class="d-flex justify-content-center mb-4">
-                            <button type="submit" class="btn-main text-center">
+                            <button type="submit" class="btn-main text-center" id="kayak-submit-btn">
                                 Réserver mon kayak
                             </button>
                         </div>
