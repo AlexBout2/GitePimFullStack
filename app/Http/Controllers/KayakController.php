@@ -84,31 +84,58 @@ public function validateSejourNumber(Request $request)
     }
 
    public function store(Request $request)
-    {
-        try {
-            // Validation des données d'entrée
-            $request->validate([
-                'sejour_number' => 'required|string',
-                'date' => 'required|date',
-                'creneauKayak' => 'required|integer|min:1|max:4',
-                'nbrPersonnes' => 'required|integer|min:1',
-                'nbr_kayaks_simples' => 'required|integer|min:0',
-                'nbr_kayaks_doubles' => 'required|integer|min:0'
-            ]);
-            
-            // Vérifier que la somme des kayaks n'est pas nulle
-            if ($request->nbr_kayaks_simples + $request->nbr_kayaks_doubles <= 0) {
-                return back()->withErrors(['kayaks' => 'Vous devez réserver au moins un kayak.']);
-            }
-            
-            // Créer la réservation en utilisant notre modèle
-            $reservation = Kayak::createReservation($request->all());
-            
-            // Redirection avec message de succès
-            return redirect()->route('kayak.confirmation', ['code' => $reservation->codeResaKayak])
-                             ->with('success', 'Votre réservation a été confirmée!');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+{
+    try {
+        // Validation des données
+        $validated = $request->validate([
+            'sejour_number' => 'required|string',
+            'date' => 'required|date',
+            'heure_debut' => 'required|integer|min:9|max:15',
+            'nbrPersonnes' => 'required|integer|min:1|max:8',
+            'nbr_kayaks_simple' => 'required|integer|min:0|max:2',
+            'nbr_kayaks_double' => 'required|integer|min:0|max:3',
+        ]);
+
+        // Vérifier que le séjour existe
+        $sejour = \App\Models\Sejour::where('codeResaSejour', $validated['sejour_number'])->first();
+        if (!$sejour) {
+            throw new \Exception('Séjour introuvable.');
         }
+
+        // Vérifier que la date est dans la période du séjour
+        $dateReservation = \Carbon\Carbon::parse($validated['date']);
+        $startDate = \Carbon\Carbon::parse($sejour->startDate);
+        $endDate = \Carbon\Carbon::parse($sejour->endDate);
+        
+        if ($dateReservation->lt($startDate) || $dateReservation->gt($endDate)) {
+            throw new \Exception("La date de réservation doit être comprise dans votre période de séjour.");
+        }
+
+        // Vérifier que les kayaks sont disponibles
+        // (Code simplifié pour l'exemple)
+
+        // Créer la réservation
+        $kayak = new \App\Models\Kayak();
+        $kayak->codeResaKayak = 'KA' . date('ymd') . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
+        $kayak->dateReservation = $validated['date'];
+        $kayak->creneauKayak = $validated['heure_debut'];
+        $kayak->nbKayakSimple = $validated['nbr_kayaks_simple'];
+        $kayak->nbKayakDouble = $validated['nbr_kayaks_double'];
+        $kayak->nbPersonnesTotales = $validated['nbrPersonnes'];
+        $kayak->sejourId = $sejour->id;
+        $kayak->save();
+
+        // Redirection avec un message de succès
+        return redirect()->route('kayak.show', ['id' => $kayak->id])
+            ->with('success', 'Votre réservation de kayak a été créée avec succès!');
+    
+            Log::info('Données du formulaire kayak:', $request->all());
+    } catch (\Exception $e) {
+        \Log::error('Erreur lors de la réservation de kayak: ' . $e->getMessage());
+        return back()
+            ->withInput()
+            ->withErrors(['error' => 'Une erreur est survenue lors de la réservation: ' . $e->getMessage()]);
     }
+}
+
 }

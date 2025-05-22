@@ -6,12 +6,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const kayakFormContainer = document.getElementById("kayak-form-container");
     const kayakForm = document.getElementById("kayak-reservation-form");
     const dateInput = document.getElementById("date");
-    const nbPersonnesSelect = document.getElementById("nbrPersonnes");  // Attention au nom du champ
-    const nbKayakSimpleInput = document.getElementById("nbr_kayaks_simples");  // Ajuster selon vos noms de champs
-    const nbKayakDoubleInput = document.getElementById("nbr_kayaks_doubles");  // Ajuster selon vos noms de champs
+    const nbPersonnesSelect = document.getElementById("nb_personnes");
+    const nbKayakSimpleInput = document.getElementById("nb_kayak_simple");
+    const nbKayakDoubleInput = document.getElementById("nb_kayak_double");
     const heureDebutSelect = document.getElementById("heure_debut");
     const kayakError = document.getElementById("kayak-error");
     const hourAvailabilityMessage = document.getElementById("hour-availability-message");
+
+    console.log("Éléments du formulaire:", {
+        sejourInput, sejourHidden, sejourValidationBtn,
+        kayakFormContainer, kayakForm,
+        nbPersonnesSelect, nbKayakSimpleInput, nbKayakDoubleInput,
+        heureDebutSelect
+    });
 
     // Initialisation des éléments de formulaire
     if (!kayakForm) return; // Quitter si le formulaire n'existe pas
@@ -20,21 +27,24 @@ document.addEventListener("DOMContentLoaded", function () {
     if (sejourValidationBtn) {
         sejourValidationBtn.addEventListener("click", function () {
             const sejourNumber = sejourInput.value.trim();
+            console.log("Bouton de validation cliqué, numéro de séjour:", sejourNumber);
 
             if (!sejourNumber) {
                 sejourInput.classList.add("is-invalid");
                 return;
             }
 
-            // Il y a un conflit entre les deux approches de validation dans votre code
-            // Utilisons l'approche directe plutôt que l'event binding jQuery
             validateSejour(sejourNumber);
         });
     }
 
+    // Fonction de validation du numéro de séjour
     function validateSejour(sejourNumber) {
         // Récupérer le token CSRF depuis la balise meta
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        console.log("Validation du séjour:", sejourNumber);
+        console.log("kayakFormContainer existe:", !!kayakFormContainer);
 
         // Utiliser l'API Fetch pour valider uniquement le numéro de séjour
         fetch('/validate-sejour-number', {
@@ -48,26 +58,47 @@ document.addEventListener("DOMContentLoaded", function () {
                 sejour_number: sejourNumber
             })
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur réseau');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
+                console.log("Réponse de validation:", data);
+
                 if (data.valid) {
-                    showKayakForm(sejourNumber);
+                    // Séjour valide, afficher le formulaire de kayak
+                    sejourInput.classList.remove("is-invalid");
+                    sejourInput.classList.add("is-valid");
+
+                    // Important: Stocker l'ID de séjour dans le champ caché
+                    if (sejourHidden) {
+                        sejourHidden.value = sejourNumber;
+                    }
+
+                    // Afficher le formulaire de réservation de kayak
+                    if (kayakFormContainer) {
+                        console.log("Affichage du formulaire de kayak");
+                        kayakFormContainer.classList.remove("d-none");
+                        // Si vous utilisez style.display au lieu de classList
+                        kayakFormContainer.style.display = "block";
+
+                        // Faire défiler jusqu'au formulaire
+                        kayakFormContainer.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        console.error("kayakFormContainer est introuvable");
+                    }
                 } else {
+                    // Séjour non valide, afficher message d'erreur
                     sejourInput.classList.add("is-invalid");
-                    const feedback = sejourInput.nextElementSibling;
-                    if (feedback) feedback.textContent = data.message || "Numéro de séjour invalide";
+                    if (kayakError) {
+                        kayakError.innerText = data.message || 'Numéro de séjour invalide';
+                        kayakError.classList.remove("d-none");
+                    }
                 }
             })
             .catch(error => {
                 console.error('Erreur lors de la validation du séjour:', error);
-                sejourInput.classList.add("is-invalid");
-                const feedback = sejourInput.nextElementSibling;
-                if (feedback) feedback.textContent = "Erreur lors de la validation. Veuillez réessayer.";
+                if (kayakError) {
+                    kayakError.innerText = "Erreur de communication avec le serveur";
+                    kayakError.classList.remove("d-none");
+                }
             });
     }
 
@@ -122,19 +153,6 @@ document.addEventListener("DOMContentLoaded", function () {
         dateInput.addEventListener('change', validateDateForSejour);
     }
 
-
-
-    function showKayakForm(sejourNumber) {
-        sejourInput.classList.remove("is-invalid");
-        sejourHidden.value = sejourNumber;
-
-        // Afficher le formulaire de réservation kayak
-        kayakFormContainer.style.display = "block";
-
-        // Faire défiler jusqu'au formulaire de réservation
-        kayakFormContainer.scrollIntoView({ behavior: 'smooth' });
-    }
-
     // Configuration des compteurs de kayaks
     setupKayakCounters();
 
@@ -150,28 +168,38 @@ document.addEventListener("DOMContentLoaded", function () {
     // Validation du formulaire avant soumission
     if (kayakForm) {
         kayakForm.addEventListener("submit", function (event) {
-            // Toujours empêcher la soumission par défaut
+            // Empêcher la soumission par défaut
             event.preventDefault();
+
+            console.log("Formulaire soumis"); // Logs pour debug
 
             // Réexécuter les validations
             const kayakValid = validateKayakDistribution();
             const horaireValid = validateHoraireDisponibilite();
             const dateValid = !!dateInput.value && !dateInput.classList.contains("is-invalid");
 
+            console.log("Validations:", { kayakValid, horaireValid, dateValid });
+
             // Si toutes les validations sont réussies
             if (kayakValid && horaireValid && dateValid) {
                 // Vérifier si tous les champs requis sont remplis
+                const nbKayakSimples = parseInt(nbKayakSimpleInput?.value || 0);
+                const nbKayakDoubles = parseInt(nbKayakDoubleInput?.value || 0);
+
                 const allFieldsFilled = [
                     dateInput.value,
                     heureDebutSelect.value,
                     nbPersonnesSelect.value,
                     // Au moins un des deux types de kayak doit être > 0
-                    (parseInt(nbKayakSimpleInput.value) > 0 || parseInt(nbKayakDoubleInput.value) > 0)
+                    (nbKayakSimples > 0 || nbKayakDoubles > 0)
                 ].every(Boolean);
 
+                console.log("Tous les champs remplis:", allFieldsFilled);
+
                 if (allFieldsFilled) {
-                    // Soumettre le formulaire manuellement si tout est valide
-                    this.submit();
+                    console.log("Soumission du formulaire...");
+                    // Assurez-vous que le formulaire est soumis correctement
+                    kayakForm.submit(); // Soumettre le formulaire explicitement
                 } else {
                     // Afficher un message d'erreur général
                     alert('Veuillez remplir tous les champs requis.');

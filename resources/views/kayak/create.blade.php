@@ -64,7 +64,7 @@
                     </div>
                 </div>
 
-                <div class="row" id="kayak-form-container" style="display: none;">
+                <div class="row d-none" id="kayak-form-container">
                     <form id="kayak-reservation-form" class="col-md-6 col-11 mx-auto reservation-form mt-4"
                         action="{{ route('kayak.store') }}" method="POST">
                         @csrf
