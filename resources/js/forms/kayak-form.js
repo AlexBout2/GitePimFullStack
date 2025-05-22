@@ -30,27 +30,31 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function validateSejour(sejourNumber) {
-        // Simulation de vérification du séjour
-        // Dans une implémentation réelle, on ferait une requête AJAX au serveur
+        $('.sejour-validation').on('click', function () {
+            const sejourNumber = $('#sejour-number').val();
+            const activityDate = $('#date').val();
 
-        // Exemple de requête AJAX (à décommenter et adapter)
-        /*
-        fetch('/api/verify-sejour/' + sejourNumber)
-            .then(response => response.json())
-            .then(data => {
-                if (data.valid) {
-                    showKayakForm(sejourNumber);
-                } else {
-                    sejourInput.classList.add("is-invalid");
+            $.ajax({
+                url: "{{ route('sejour.validate') }}",
+                type: "POST",
+                data: {
+                    sejour_number: sejourNumber,
+                    date: activityDate,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (response) {
+                    if (response.valid) {
+                        // Afficher un message de succès
+                        // Déverrouiller le reste du formulaire
+                    } else {
+                        // Afficher l'erreur
+                        $('#sejour-number').addClass('is-invalid');
+                        $('.invalid-feedback').text(response.message).show();
+                    }
                 }
-            })
-            .catch(() => {
-                // Gérer les erreurs
-                sejourInput.classList.add("is-invalid");
             });
-        */
+        });
 
-        // Pour l'exemple, nous acceptons tout numéro
         showKayakForm(sejourNumber);
     }
 
