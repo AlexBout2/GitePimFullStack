@@ -10,4 +10,9 @@ class KayakController extends Controller
 {
     return view('kayak.index');
 }
+
+    public function create()
+{
+    return view('kayak.create');
+}
 }

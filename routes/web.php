@@ -20,9 +20,17 @@ Route::get('/chambres/create', [ChambreController::class, 'create'])->name('cham
 Route::get('/sejour/create', [SejourController::class, 'create'])->name('sejour.create');
 Route::post('/sejour', [SejourController::class, 'store'])->name('sejour.store');
 
+// Routes pour le module Kayak (complétées)
+Route::get('/kayak', [KayakController::class, 'index'])->name('kayak.index');
+Route::get('/kayak/create', [KayakController::class, 'create'])->name('kayak.create');
+Route::post('/kayak', [KayakController::class, 'store'])->name('kayak.store');
+Route::get('/kayak/{id}', [KayakController::class, 'show'])->name('kayak.show');
+Route::get('/check-kayak-availability', [KayakController::class, 'checkAvailability'])->name('kayak.check-availability');
+
+
 Route::get('/repas', [RepasController::class, 'index'])->name('repas.index');
 Route::get('/cheval', [ChevalController::class, 'index'])->name('cheval.index');
-Route::get('/kayak', [KayakController::class, 'index'])->name('kayak.index');
+
 Route::get('/bagne', [BagneController::class, 'index'])->name('bagne.index');
 Route::get('/garderie', [GarderieController::class, 'index'])->name('garderie.index');
 

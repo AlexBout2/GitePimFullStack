@@ -21,14 +21,14 @@
 
 
 .hero .hero-container {
-    background-image: url("../../public/media/bungalow/Hero-Cha1.jpg");
+    background-image: url("../../../public/media/bungalow/Hero-Cha1.jpg");
     background-position: 50% 50%;
     background-size: cover;
     height: 70vh;
 }
 
 .hero-resa .hero-container-resa {
-    background-image: url("../../public/media/bungalow/Hero-Cha2.jpg");
+    background-image: url("../../../public/media/bungalow/Hero-Cha2.jpg");
     background-position: 50% 70%;
     background-repeat: no-repeat;
     background-size: cover;
@@ -37,7 +37,7 @@
 }
 
 .chambre-footer {
-    background-image: url("../../public/media/bungalow/Footer-01.jpg");
+    background-image: url("../../../public/media/bungalow/Footer-01.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

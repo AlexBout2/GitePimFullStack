@@ -17,8 +17,8 @@ h4 {
 }
 
 
-.hero .hero-container-kayak {
-    background-image: url("../../public/media/kayak/HeroKayak.webp");
+.hero .hero-container {
+    background-image: url("../../../public/media/kayak/HeroKayak.webp");
     background-position: 40% 80%;
     background-position: no-repeat;
     height: 70vh;
@@ -26,7 +26,7 @@ h4 {
 }
 
 .hero-resa .hero-container-resa {
-    background-image: url("../../public/media/kayak/HeroKayak.webp");
+    background-image: url("../../../public/media/kayak/HeroKayak.webp");
     background-position: 50% 60%;
     height: 30vh;
 }
@@ -187,7 +187,7 @@ h4 {
 
 
 .img-resa-kayak {
-    background-image: url("../../public/media/kayak/empty-kayak-boat-ship-tropical-beach-sea.webp");
+    background-image: url("../../../public/media/kayak/empty-kayak-boat-ship-tropical-beach-sea.webp");
     background-position: 40% 80%;
     height: 50vh;
 }

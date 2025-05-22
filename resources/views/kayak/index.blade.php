@@ -26,7 +26,7 @@
     <meta property="og:site_name" content="Gîte Pim">
 
     <link rel="icon" type="image/x-icon" href="{{ asset('resources/media/logo.ico') }}">
-    @vite(['resources/css/front.css', 'resources/js/front.js'])
+    @vite(['resources/css/front.css', 'resources/js/front.js', 'resources/css/modules/kayak.css'])
 
     <link rel="canonical" href="{{ route('kayak.index') }}">
 </head>
@@ -44,7 +44,7 @@
                     Découvrez notre île seul, en famille ou entre amies.
                 </h2>
             </div>
-            <a href="{{ route('chambres.create') }}" class="btn-main" aria-label="Réserver pour le kayak">
+            <a href="{{ route('kayak.create') }}" class="btn-main" aria-label="Réserver pour le kayak">
                 <span class="btn-text">RÉSERVEZ</span>
             </a>
         </div>
@@ -234,7 +234,7 @@
                                 <p class="lh-sm text-white fs-3 fs-md-3">Kayak double : 3</p>
                             </div>
                             <div class="d-flex justify-content-center mb-3">
-                                <a href="{{ route('chambres.create') }}" class="btn-main mx-auto"
+                                <a href="{{ route('kayak.create') }}" class="btn-main mx-auto"
                                     aria-label="Réserver pour votre kayak">
                                     <span class="btn-text">RÉSERVEZ</span>
                                 </a>
